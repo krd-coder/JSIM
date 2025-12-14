@@ -1,15 +1,15 @@
 #ifndef WORKI_H
 #define WORKI_H
 
-struct przedmiot {
-    worek **location;
-};
-
 struct worek {
     int id;
     int elements_count;
     worek **location;
     worek **my_location;
+};
+
+struct przedmiot {
+    worek **location;
 };
 
 // Nowy przedmiot na biurku

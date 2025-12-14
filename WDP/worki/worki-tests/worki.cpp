@@ -2,16 +2,21 @@
 
 worek* table;
 int id_counter = 0;
+bool init = false;
 
 void initialize()
 {
-    *table = { -1, 0, nullptr, nullptr };
-    table->my_location = new worek*;
+    table = new worek;
+    table->elements_count = 0;
+    table->id = -1;
+    table->my_location = new (worek*);
     *table->my_location = table;
+    init = true;
 }
 
 przedmiot *nowy_przedmiot()
 {
+    if(!init)initialize();
     przedmiot *p = new przedmiot;
     p->location = table->my_location;
     return p;
@@ -19,14 +24,14 @@ przedmiot *nowy_przedmiot()
 
 worek *nowy_worek()
 {
+    if(!init)initialize();
     worek *w = new worek;
-    w->id = id_counter; // Assign unique ID as needed
+    w->id = id_counter;
     id_counter++;
-    w->elements_count = 0;
+    w->elements_count=0;
     w->location = table->my_location;
-    w->my_location = new worek*;
+    w->my_location = new (worek*);
     *w->my_location = w;
-    return w;
 }
 
 void wloz(przedmiot *co, worek *gdzie)
@@ -38,7 +43,7 @@ void wloz(przedmiot *co, worek *gdzie)
 void wloz(worek *co, worek *gdzie)
 {
     co->location = gdzie->my_location;
-    gdzie->elements_count++;
+    gdzie->elements_count+=co->elements_count;
 }
 
 void wyjmij(przedmiot *p)
@@ -49,18 +54,18 @@ void wyjmij(przedmiot *p)
 
 void wyjmij(worek *w)
 {
-    (*w->location)->elements_count-=w->elements_count + 1;
+    (*w->location)->elements_count-=w->elements_count;
     w->location = table->my_location;
 }
 
 int w_ktorym_worku(przedmiot *p)
 {
-    return (p->location == &table) ? -1 : (*p->location)->id;
+    return (*p->location)->id;
 }
 
 int w_ktorym_worku(worek *p)
 {
-    return (p->location == &table) ? -1 : (*p->location)->id;
+    return (*p->location)->id;
 }
 
 int ile_przedmiotow(worek *w)
@@ -80,5 +85,5 @@ void na_odwrot(worek *w)
 
 void gotowe()
 {
-    // Implement memory cleanup if necessary
+
 }
