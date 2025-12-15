@@ -6,10 +6,12 @@ struct worek {
     int elements_count;
     worek **location;
     worek **my_location;
+    worek* prev;// for cleanup
 };
 
 struct przedmiot {
     worek **location;
+    przedmiot* prev;// for cleanup
 };
 
 // Nowy przedmiot na biurku

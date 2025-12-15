@@ -1,5 +1,4 @@
 #include "worki.h"
-#include "worki.cpp"
 #include <assert.h>
 #include <vector>
 
