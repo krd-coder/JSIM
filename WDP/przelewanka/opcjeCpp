@@ -1,0 +1,14 @@
+-std=c++17
+-pedantic
+-Wall
+-Wextra
+-Wduplicated-cond
+-Wfloat-equal
+-Wshadow
+-Wlogical-not-parentheses
+-Werror
+-fstack-protector-strong
+-fsanitize=undefined
+-fno-sanitize-recover
+-g
+-fno-omit-frame-pointer
