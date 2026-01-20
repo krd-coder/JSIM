@@ -12,7 +12,7 @@
       "cwd": "c:/Users/pisar/Desktop/JSIM/WDP/przelewanka",
       "program": "c:/Users/pisar/Desktop/JSIM/WDP/przelewanka/przelewanka.exe",
       "MIMode": "gdb",
-      "miDebuggerPath": "gdb",
+      "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",
