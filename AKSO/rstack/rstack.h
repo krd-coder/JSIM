@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 #include <inttypes.h>
-#include<stdbool.h>
+#include <stdbool.h>
 
 typedef struct rstack rstack_t;
 

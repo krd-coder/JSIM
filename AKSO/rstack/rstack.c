@@ -1,9 +1,11 @@
 #include "rstack.h"
 #include <stdlib.h>
-#include<stdbool.h>
+#include <stdbool.h>
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <ctype.h>
 
 // Deklaracja zapowiadająca (Forward declaration), żeby struktura elementu
 // mogła używać wskaźnika na rstack_t, zanim sam rstack_t zostanie zdefiniowany.
@@ -16,8 +18,8 @@ typedef enum {
 } elem_type_t;
 
 // 2. Struktura pojedynczego elementu na stosie (Tagged Union).
-typedef struct {
-    rstack_elem_t* prev;       // Wskaźnik do poprzedniego elementu (stos jest trzymany jako lista jednokierunkowa)
+typedef struct rstack_elem {
+    struct rstack_elem* prev;       // Wskaźnik do poprzedniego elementu (stos jest trzymany jako lista jednokierunkowa)
     elem_type_t type;       // Przechowuje informację, którego pola z unii należy użyć
     union {
         uint64_t number;    // Wartość, jeśli element to liczba
@@ -38,6 +40,7 @@ rstack_t* rstack_new()
 {
     rstack_t *rs = malloc(sizeof(rstack_t));
     if (rs == NULL)
+
         return NULL;
     // Inicjalizacja struktury rstack_t.
     rs->ref_count = 1;
@@ -166,22 +169,29 @@ bool rstack_empty_recursive(rstack_t* rs, history_node_t* history)
         }
         elem = elem->prev; // Przechodzimy do kolejnego elementu
     }
-    
+    return true; // Nie znaleźliśmy żadnej liczby, więc stos jest pusty
 }
 
 bool rstack_empty(rstack_t *rs) {
     if (rs == NULL) return true;
-    return check_empty_recursive(rs, NULL);
+    return rstack_empty_recursive(rs, NULL);
 }
 
-result_t rstack_front_recursive(rstack_t *rs, history_node_t *history)
+typedef struct result_depth 
+{
+    bool flag;  // To pole mówi, czy pole value zawiera wynik.
+    uint64_t value; // W tym polu jest właściwy wynik.
+    size_t depth; // Głębokość rekurencji, przy której znaleźliśmy wynik
+} result_depth_t;
+
+result_depth_t rstack_front_recursive(rstack_t *rs, history_node_t *history, size_t current_depth)
 {
     history_node_t *curr = history;
     while (curr != NULL) 
     {
         if (curr->current_stack == rs) 
         {
-            result_t result = { .flag = false, .value = 0 }; // Znaleźliśmy cykl, zwracamy domyślny wynik
+            result_depth_t result = { .flag = false, .value = 0 }; // Znaleźliśmy cykl, zwracamy domyślny wynik
             return result;
         }
         curr = curr->prev;
@@ -191,44 +201,184 @@ result_t rstack_front_recursive(rstack_t *rs, history_node_t *history)
     history_node_t new_history = { .current_stack = rs, .prev = history };
 
     rstack_elem_t* elem = rs->top_element;
-    while (elem != NULL) {
-        if (elem->type == TYPE_UINT64) {
-            result_t result = { .flag = true, .value = elem->data.number }; // Znaleźliśmy liczbę - ustawiamy flagę na true i zapisujemy wartość
-            return result; // Zwracamy wynik
-        } else if (elem->type == TYPE_STACK) {
+    result_depth_t best_result = { .flag = false, .value = 0, .depth = 0 }; // Najlepszy wynik znaleziony do tej pory
+    while (elem != NULL) 
+    {
+        if (elem->type == TYPE_UINT64) 
+        {
+            result_depth_t result = { .flag = true, .value = elem->data.number, .depth = current_depth }; // Znaleźliśmy liczbę - ustawiamy flagę na true i zapisujemy wartość
+            if(!best_result.flag || result.depth > best_result.depth) 
+            {
+                best_result = result; // Aktualizujemy najlepszy wynik, jeśli jest głębiej
+            }
+        } 
+        else if (elem->type == TYPE_STACK) 
+        {
             // Jeśli element to stos, sprawdzamy go rekurencyjnie
-            result_t result = rstack_front_recursive(elem->data.stack, &new_history);
-            if (result.flag) {
-                return result; // Znaleźliśmy liczbę w zagnieżdżonym stosie, zwracamy wynik
+            result_depth_t result = rstack_front_recursive(elem->data.stack, &new_history, current_depth + 1);
+            if(!best_result.flag || result.depth > best_result.depth) 
+            {
+                best_result = result; // Aktualizujemy najlepszy wynik, jeśli jest głębiej
             }
         }
         elem = elem->prev; // Przechodzimy do kolejnego elementu
     }
     
-    result_t result = { .flag = false, .value = 0 }; // Jeśli nie znaleźliśmy żadnej liczby, zwracamy domyślny wynik
-    return result;
+    return best_result; // Zwracamy najlepszy wynik znaleziony w tej gałęzi
 }
 
 result_t rstack_front(rstack_t *rs)
 {
-    result_t result = { .flag = false, .value = 0 }; // Domyślny wynik - stos jest pusty
-    if (rs == NULL) return result; // Jeśli wskaźnik jest NULL, zwracamy domyślny wynik
+    if (rs == NULL) {
+        result_t result = { .flag = false, .value = 0 }; // Jeśli stos jest NULL, zwracamy domyślny wynik
+        return result;
+    }   
+    result_depth_t best_result = rstack_front_recursive(rs, NULL, 0);
+    result_t final_result = { .flag = best_result.flag, .value = best_result.value }; // Przekształcamy wynik z result_depth_t na result_t, ignorując głębokość
+    return final_result;
+}
 
-    rstack_elem_t* elem = rs->top_element;
+// Stany odczytu z pliku, które mogą wystąpić podczas próby odczytania liczby uint64_t z pliku tekstowego
+typedef enum {
+    READ_OK,     // Udało się odczytać poprawną liczbę
+    READ_EOF,    // Koniec pliku (nie ma więcej liczb)
+    READ_ERROR   // Błąd (zły znak, za duża liczba itp.)
+} read_status_t;
+
+read_status_t read_next_uint64(FILE *file, uint64_t *out_value) {
+    int c;
+
+    // 1. Zignoruj wszystkie białe znaki na początku
+    do {
+        c = fgetc(file);
+    } while (c != EOF && isspace(c));
+
+    // Jeśli po ominięciu spacji/enterów trafiliśmy na koniec pliku, to znaczy
+    // że po prostu plik się skończył. To nie jest błąd.
+    if (c == EOF) {
+        return READ_EOF; 
+    }
+
+    // 2. Zbieraj znaki do bufora, aż trafisz na kolejny biały znak lub koniec pliku
+    // Maksymalna wartość uint64_t ma 20 cyfr (18446744073709551615).
+    // Bufor o wielkości 64 znaków jest więc aż nadto bezpieczny.
+    char buffer[64];
+    size_t idx = 0;
+
+    while (c != EOF && !isspace(c)) {
+        if (idx < sizeof(buffer) - 1) {
+            buffer[idx++] = (char)c;
+        } else {
+            // Zabezpieczenie: "słowo" w pliku jest nienaturalnie długie, 
+            // na pewno nie jest to poprawne uint64_t.
+            errno = EINVAL; 
+            return READ_ERROR;
+        }
+        c = fgetc(file);
+    }
+
+    buffer[idx] = '\0'; // Pamiętaj o znaku końca łańcucha!
+
+    // 3. Konwersja bezpieczną funkcją strtoull
+    char *endptr;
+    errno = 0; // Zawsze zerujemy errno przed wywołaniem funkcji z <stdlib.h>
+    unsigned long long val = strtoull(buffer, &endptr, 10);
+
+    // 4. Dokładna weryfikacja poprawności (tego wymaga zadanie!)
+    if (buffer == endptr) {
+        // Nie było żadnych cyfr (np. w pliku było słowo "pies")
+        errno = EINVAL;
+        return READ_ERROR;
+    }
+    if (*endptr != '\0') {
+        // Po cyfrach były inne znaki (np. "1234abc")
+        errno = EINVAL;
+        return READ_ERROR;
+    }
+    if (errno == ERANGE) {
+        // Liczba składała się z samych cyfr, ale była za duża na 64 bity (Overflow)
+        errno = EINVAL;
+        return READ_ERROR;
+    }
+
+    // Wszystko poszło idealnie, zapisujemy wynik
+    *out_value = (uint64_t)val;
+    return READ_OK;
+}
+
+rstack_t* rstack_read(char const *path)
+{
+    if (path == NULL) {
+        errno = EINVAL; // Ustawiamy errno na EINVAL, jeśli argument jest NULL
+        return NULL;
+    }
+
+    FILE *file = fopen(path, "rb");
+    if (file == NULL) 
+    {
+        return NULL;
+    }
+
+    rstack_t *rs = rstack_new();
+    if (rs == NULL) {
+        fclose(file);
+        return NULL;
+    }
+
+    uint64_t value;
+    read_status_t status;
+    while ((status = read_next_uint64(file, &value)) == READ_OK) 
+    {
+        if (rstack_push_value(rs, value) != 0) 
+        {
+            rstack_delete(rs);
+            fclose(file);
+            return NULL;
+        }
+    }
+
+    fclose(file);
+    return rs;
+}
+
+// Pomocnicza funkcja do zapisu stosu rekurencyjnie
+int write_stack_recursive(FILE *file, rstack_t *stack) 
+{
+    if (stack == NULL) return 0; // Nic do zapisania
+
+    rstack_elem_t* elem = stack->top_element;
     while (elem != NULL) {
         if (elem->type == TYPE_UINT64) {
-            result.flag = true; // Znaleźliśmy liczbę - ustawiamy flagę na true
-            result.value = elem->data.number; // Zapisujemy wartość liczby
-            return result; // Zwracamy wynik
+            // Zapisujemy liczbę do pliku
+            if (fprintf(file, "%" PRIu64 "\n", elem->data.number) < 0) {
+                return -1; // Błąd podczas zapisu
+            }
         } else if (elem->type == TYPE_STACK) {
-            // Jeśli element to stos, sprawdzamy go rekurencyjnie
-            result = rstack_front(elem->data.stack);
-            if (result.flag) {
-                return result; // Znaleźliśmy liczbę w zagnieżdżonym stosie, zwracamy wynik
+            // Rekurencyjnie zapisujemy zagnieżdżony stos
+            if (write_stack_recursive(file, elem->data.stack) != 0) {
+                return -1; // Błąd podczas zapisu
             }
         }
         elem = elem->prev; // Przechodzimy do kolejnego elementu
     }
-    
-    return result; // Jeśli nie znaleźliśmy żadnej liczby, zwracamy domyślny wynik
+    return 0; // Sukces
+}
+
+int rstack_write(char const *path, rstack_t *rs)
+{
+    if (path == NULL || rs == NULL) {
+        errno = EINVAL; // Ustawiamy errno na EINVAL, jeśli któryś z argumentów jest NULL
+        return -1;
+    }
+
+    FILE *file = fopen(path, "wb");
+    if (file == NULL) {
+        return -1;
+    }
+
+    int result = write_stack_recursive(file, rs);
+    int saved_errno = errno; // Zapisujemy errno, bo fclose może je nadpisać
+    fclose(file);
+    errno = saved_errno; // Przywracamy errno do stanu sprzed fclose
+    return result; // Zwracamy wynik operacji zapisu
 }
