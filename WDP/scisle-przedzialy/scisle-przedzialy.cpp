@@ -16,8 +16,8 @@ struct node
 
 bool comp(node* a, node* b)
 {
-    if(abs(a->val-b->val)<0.000001)return a->index > b->index;
-    return a->val<b->val;
+    if(abs(a->val - b->val) < 0.000001)return a->index > b->index;
+    return a->val < b->val;
 }
 
 class p_queue
@@ -27,8 +27,8 @@ class p_queue
     p_queue()
     {
         MID = new node();
-        FRONT=MID;
-        BACK=MID;
+        FRONT = MID;
+        BACK = MID;
     }       
     void push(int _index, double _val)
     {
@@ -38,7 +38,7 @@ class p_queue
         Node->val = _val;
         Node->prev = FRONT;
         Node->next = nullptr;
-        FRONT->next=Node;
+        FRONT->next = Node;
         if(FRONT!=MID)
         {
                 if(comp(Node, FRONT->min))
@@ -53,10 +53,10 @@ class p_queue
         }
         else 
         {
-            Node->max=Node;
-            Node->min=Node;
+            Node->max = Node;
+            Node->min = Node;
         }
-        FRONT=Node;
+        FRONT = Node;
     }
     void pop()
     {
@@ -71,7 +71,7 @@ class p_queue
                 BACK->prev = FRONT;   
                 BACK = FRONT;
                 FRONT = tmp;
-                tmp->next=nullptr;
+                tmp->next = nullptr;
                 if(i)
                 {
                     if(comp(BACK, BACK->next->min))
@@ -85,8 +85,8 @@ class p_queue
                 }
                 else
                 {
-                    BACK->min=BACK;
-                    BACK->max=BACK;
+                    BACK->min = BACK;
+                    BACK->max = BACK;
                 }
             }            
         }
@@ -98,29 +98,29 @@ class p_queue
     }
     pair<int,int> min_element()
     {
-        if(!size)return pr(nullptr);
-        if(BACK==MID)return pr(FRONT->min);
-        if(FRONT==MID)return pr(BACK->min);
-        return comp(FRONT->min, BACK->min) ? pr(FRONT->min) : pr(BACK->min);
+        if(!size)return node2pair(nullptr);
+        if(BACK == MID)return node2pair(FRONT->min);
+        if(FRONT == MID)return node2pair(BACK->min);
+        return comp(FRONT->min, BACK->min) ? node2pair(FRONT->min) : node2pair(BACK->min);
     }
     pair<int,int> max_element()
     {
-        if(!size)return pr(nullptr);
-        if(BACK==MID)return pr(FRONT->max);
-        if(FRONT==MID)return pr(BACK->max);
-        return comp(BACK->max, FRONT->max) ? pr(FRONT->max) : pr(BACK->max);
+        if(!size)return node2pair(nullptr);
+        if(BACK == MID)return node2pair(FRONT->max);
+        if(FRONT == MID)return node2pair(BACK->max);
+        return comp(BACK->max, FRONT->max) ? node2pair(FRONT->max) : node2pair(BACK->max);
     }
     pair<int,int> front()
     {
-        if(!size)return pr(nullptr);
-        if(FRONT==MID)return pr(MID->prev);
-        return pr(FRONT);
+        if(!size)return node2pair(nullptr);
+        if(FRONT == MID)return node2pair(MID->prev);
+        return node2pair(FRONT);
     }
     pair<int,int> back()
     {
-        if(!size)return pr(nullptr);
-        if(BACK==MID)return pr(MID->next);
-        return pr(BACK);
+        if(!size)return node2pair(nullptr);
+        if(BACK == MID)return node2pair(MID->next);
+        return node2pair(BACK);
     }
     int length()
     {
@@ -132,9 +132,9 @@ class p_queue
     }
     private:
     node *FRONT, *BACK, *MID;
-    pair<int,int> pr(node* Node)
+    pair<int,int> node2pair(node* Node)
     {
-        if(Node==nullptr)return {-1,-1};
+        if(Node == nullptr)return {-1,-1};
         return {Node->index, (int)Node->val};
     }
 };
@@ -142,7 +142,7 @@ class p_queue
 int main()
 {
     int n, U;
-    cin>>n>>U;
+    cin >> n >> U;
     p_queue Q;
     vector<int> max_seg(n,0);
     vector<int> result(n);
@@ -150,7 +150,7 @@ int main()
     for (int i = 0; i < n; i++)
     {
         int x,y;
-        cin>>x>>y;
+        cin >> x >> y;
         points.push_back({x,y});
         Q.push(i,y);
         while (Q.max_element().second - Q.min_element().second > U)
@@ -160,22 +160,22 @@ int main()
     
     Q.clear();
 
-    for (int i = n-1; i >=0;)
+    for (int i = n - 1; i >=0;)
     {
-        double val = ((double)points[i-max_seg[i]+1].first-(double)points[i].first);
-        val*=val;
-        val/=max_seg[i];
+        double val = ((double)points[i - max_seg[i] + 1].first - (double)points[i].first);
+        val *= val;
+        val /= max_seg[i];
         Q.push(i, val);
 
         do
         {
-            while (Q.back().first-max_seg[Q.back().first]+1>i)Q.pop();
+            while (Q.back().first-max_seg[Q.back().first] + 1 > i)Q.pop();
             result[i]=Q.max_element().first;
             i--;
         }
-        while(i>=0 && max_seg[i]+1==max_seg[i+1]);
+        while(i >= 0 && max_seg[i] + 1 == max_seg[i + 1]);
     }
 
-    for (int i = 0; i < n; i++)cout<< result[i]-max_seg[result[i]]+2<<" "<< result[i]+1<<endl;
+    for (int i = 0; i < n; i++)cout << result[i] - max_seg[result[i]] + 2 << " " << result[i] + 1 << endl;
     return 0;
 }
