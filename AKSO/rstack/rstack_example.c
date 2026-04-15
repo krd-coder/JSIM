@@ -3,6 +3,7 @@
 #endif
 
 #include "rstack.h"
+#include "rstack.c"
 #include "memory_tests.h"
 #include <assert.h>
 #include <errno.h>
