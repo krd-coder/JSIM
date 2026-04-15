@@ -185,9 +185,9 @@ static unsigned long alloc_fail_test(void) {
   rstack_t *rs;
 
   errno = 0;
-  if ((rs = rstack_new()) != nullptr)
+  if ((rs = rstack_new()) != NULL)
     visited |= V(1, 0);
-  else if (errno == ENOMEM && (rs = rstack_new()) != nullptr)
+  else if (errno == ENOMEM && (rs = rstack_new()) != NULL)
     visited |= V(2, 0);
   else
     return visited |= V(4, 0); // To nie powinno się wykonać.
