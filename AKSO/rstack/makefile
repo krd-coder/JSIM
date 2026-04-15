@@ -2,7 +2,7 @@
 CC = gcc
 
 # Flagi kompilacji (zgodnie z poleceniem)
-CFLAGS = -Wall -Wextra -Wno-implicit-fallthrough -std=gnu23 -fPIC -O2
+CFLAGS = -Wall -Wextra -Wno-implicit-fallthrough -std=gnu2x -fPIC -O2
 
 # Flagi linkera - tworzenie biblioteki współdzielonej (shared) i podmienianie funkcji pamięci pod testy
 LDFLAGS = -shared -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,--wrap=reallocarray -Wl,--wrap=free -Wl,--wrap=strdup -Wl,--wrap=strndup
