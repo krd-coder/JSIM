@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <errno.h>
 
 // Deklaracja zapowiadająca (Forward declaration), żeby struktura elementu
 // mogła używać wskaźnika na rstack_t, zanim sam rstack_t zostanie zdefiniowany.
