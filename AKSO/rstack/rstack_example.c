@@ -5,6 +5,7 @@
 #include "rstack.h"
 #include "rstack.c"
 #include "memory_tests.h"
+#include "memory_tests.c"
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
