@@ -7,11 +7,12 @@ CFLAGS = -Wall -Wextra -Wno-implicit-fallthrough -std=gnu2x -fPIC -O2
 # Flagi linkera - tworzenie biblioteki współdzielonej (shared) i podmienianie funkcji pamięci pod testy
 LDFLAGS = -shared -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,--wrap=reallocarray -Wl,--wrap=free -Wl,--wrap=strdup -Wl,--wrap=strndup
 
+
 # --- ZMIENNE DLA TESTÓW ---
 # Nazwa Twojego pliku źródłowego z funkcją main() (zmień, jeśli nazywa się inaczej)
 TEST_SRC = memory_tests.c
 # Nazwa pliku wykonywalnego, który ma powstać
-TEST_EXEC = tester
+TEST_EXEC = test
 
 # --- CELE SPECJALNE ---
 # .PHONY mówi make'owi, że "all" i "clean" to tylko nazwy akcji, a nie fizyczne pliki do stworzenia.
@@ -41,13 +42,13 @@ memory_tests.o: memory_tests.c memory_tests.h
 # --- BUDOWANIE TESTERA ---
 # Tworzy plik wykonywalny testera. Wymaga istnienia librstack.so.
 $(TEST_EXEC): $(TEST_SRC) librstack.so
-	$(CC) $(CFLAGS) $(TEST_SRC) -L. -lrstack -o $@
+	$(CC) $(CFLAGS) $(TEST_SRC) -L. -lrstack -o -std=gnu23 -fPIC $@
 
 # --- URUCHAMIANIE TESTÓW (Magia Make'a) ---
 # Wpisanie "make test" zbuduje testera i od razu odpali go w Valgrindzie.
 test: $(TEST_EXEC)
 	@echo "--- Uruchamiam testy Valgrindem ---"
-	env LD_LIBRARY_PATH=.:$$LD_LIBRARY_PATH valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(TEST_EXEC)
+	env LD_LIBRARY_PATH=.:$$LD_LIBRARY_PATH valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(TEST_EXEC) 
 
 # --- SPRZĄTANIE ---
 # Cel "clean" pozwala łatwo usunąć wszystkie wygenerowane pliki poleceniem "make clean".
