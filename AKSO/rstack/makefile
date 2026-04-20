@@ -42,7 +42,7 @@ memory_tests.o: memory_tests.c memory_tests.h
 # --- BUDOWANIE TESTERA ---
 # Tworzy plik wykonywalny testera. Wymaga istnienia librstack.so.
 $(TEST_EXEC): $(TEST_SRC) librstack.so
-	$(CC) $(CFLAGS) $(TEST_SRC) -L. -lrstack -o -std=gnu23 -fPIC $@
+	$(CC) $(CFLAGS) $(TEST_SRC) -L. -lrstack -std=gnu23 -fPIC -o $@
 
 # --- URUCHAMIANIE TESTÓW (Magia Make'a) ---
 # Wpisanie "make test" zbuduje testera i od razu odpali go w Valgrindzie.
