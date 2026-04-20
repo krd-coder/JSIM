@@ -12,7 +12,7 @@ LDFLAGS = -shared -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,--w
 # Nazwa Twojego pliku źródłowego z funkcją main() (zmień, jeśli nazywa się inaczej)
 TEST_SRC = memory_tests.c
 # Nazwa pliku wykonywalnego, który ma powstać
-TEST_EXEC = test
+TEST_EXEC = tester
 
 # --- CELE SPECJALNE ---
 # .PHONY mówi make'owi, że "all" i "clean" to tylko nazwy akcji, a nie fizyczne pliki do stworzenia.
