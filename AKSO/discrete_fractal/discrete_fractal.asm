@@ -257,7 +257,7 @@ _start:
     jmp     .calc_loop
 .calc_done:
 
-; 7b. Alokacja idealnie dopasowanego bufora dla nowej iteracji (new_buf)
+    ; 7b. Alokacja idealnie dopasowanego bufora dla nowej iteracji (new_buf)
     test    r9, r9
     jz      .empty_new_buf
     
@@ -274,8 +274,10 @@ _start:
 
     ; 7c. Przepisanie przekształconych znaków do new_buf
 .do_copy:
+    mov     r8, [rel axiom_len]         ; <--- ODTWORZENIE LIMITU (zniszczonego przez r8=-1)
+    mov     r10, [rel axiom_buf]        ; <--- ODTWORZENIE WSKAŹNIKA (zniszczonego przez r10=34)
     xor     rcx, rcx                    ; Index w starej pamięci
-    xor     r13, r13                    ; Dst_offset (wskaźnik wpisujący) w nowej pamięci
+    xor     r13, r13                    ; Dst_offset (wskaźnik wpisujący) w nowej pamięci                   ; Dst_offset (wskaźnik wpisujący) w nowej pamięci
 .copy_loop:
     cmp     rcx, r8
     jge     .copy_done
@@ -366,41 +368,40 @@ _start:
 
 
 ; --- POCZĄTEK ZARZĄDZANIA POJEMNOŚCIĄ ---
-    push    rax                         ; ZABEZPIECZ KOD ASCII!
+    push    rax                         ; Zabezpiecz kod ASCII w rax
     
-    ; Sprawdzamy, czy nowa długość całkowita zmieści się w buforze
     mov     rax, [rel next_rule_len]
-    add     rax, r9                     ; rax = przewidywana długość
+    add     rax, r9
     mov     rdi, [rel next_rule_cap]
     cmp     rax, rdi
-    jle     .capacity_ok                ; Jeśli się mieści, pomiń realokację
+    jle     .capacity_ok
 
 .realloc_loop:
-    shl     rdi, 1                      ; Podwajamy pojemność (rdi = rdi * 2)
+    shl     rdi, 1
     cmp     rdi, rax
-    jl      .realloc_loop               ; Powtarzaj podwajanie, aż pomieści
+    jl      .realloc_loop
 
     ; Zabezpieczamy resztę rejestrów pętli
+    push    r8                          ; ZABEZPIECZ R8 (długość reguły, bo mremap go zeruje!)
     push    rcx
     push    rsi
     push    r9
-    push    rdi                         ; push nowej pojemności
+    push    rdi
 
-    ; Wywołanie systemowe powiększenia pamięci (mremap)
-    mov     rdx, rdi                    ; rdx = nowa pojemność
-    mov     rdi, [rel next_rule_buf]    ; rdi = stary wskaźnik
-    mov     rsi, [rel next_rule_cap]    ; rsi = stara pojemność
-    call    do_mremap                   ; RAX zwróci nowy wskaźnik
+    mov     rdx, rdi
+    mov     rdi, [rel next_rule_buf]
+    mov     rsi, [rel next_rule_cap]
+    call    do_mremap
 
-    ; Aktualizujemy wskaźniki i metadane po udanym rozszerzeniu
     mov     [rel next_rule_buf], rax
-    pop     qword [rel next_rule_cap]   ; Ściągamy ze stosu bezpośrednio do zmiennej
+    pop     qword [rel next_rule_cap]
     pop     r9
     pop     rsi
     pop     rcx
+    pop     r8                          ; PRZYWRÓĆ R8 (możemy bezpiecznie kontynuować pętlę)
 
 .capacity_ok:
-    pop     rax                         ; PRZYWRÓĆ KOD ASCII DO RAX!
+    pop     rax
     ; --- KONIEC ZARZĄDZANIA POJEMNOŚCIĄ ---
 
 
