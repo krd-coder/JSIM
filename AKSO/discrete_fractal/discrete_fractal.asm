@@ -137,6 +137,8 @@ _start:
     inc     qword [rel axiom_len]
     jmp     .read_axiom_loop
 .axiom_done:
+    cmp     qword [rel axiom_len], 0    ; Czy aksjomat ma przynajmniej 1 znak?
+    je      error_exit                  ; Jeśli nie, zgłoś błąd!
 
     ; 5. Wczytywanie kolejnych linii (reguły zastępowania)
 .read_rules_loop:
@@ -576,27 +578,41 @@ write_all:
 ; mmap_alloc - Funkcja rezerwująca pamięć z mmap (wielkość w rdi). Zwraca RAX.
 mmap_alloc:
     push    rdi
+    push    rsi
+    push    rdx
+    push    r8
+    push    r9
+    push    r10
     mov     rax, SYS_MMAP
-    mov     rsi, rdi                    ; Length
-    xor     rdi, rdi                    ; Domyślny adres null
+    mov     rsi, rdi
+    xor     rdi, rdi
     mov     rdx, PROT_READ | PROT_WRITE
     mov     r10, MAP_PRIVATE | MAP_ANONYMOUS
-    mov     r8, -1                      ; Bez podpiętego deskryptora
-    xor     r9, r9                      ; Zerowy offset
+    mov     r8, -1
+    xor     r9, r9
     syscall
+    pop     r10
+    pop     r9
+    pop     r8
+    pop     rdx
+    pop     rsi
     pop     rdi
-    cmp     rax, -4096                  ; Jeśli z przedziału błędów, opuść
+    cmp     rax, -4096
     ja      error_exit
     ret
 
-; do_mremap - Wywołanie rozszerzające zarezerwowaną przestrzeń w pamięci
-; Parametry wejściowe: rdi = stary adres, rsi = stary rozmiar, rdx = nowy rozmiar
 do_mremap:
+    push    r8
+    push    r9
+    push    r10
     mov     rax, SYS_MREMAP
-    mov     r10, MREMAP_MAYMOVE         ; Opcja 1 wymuszająca pozwoleń realokacji na inny adres
+    mov     r10, MREMAP_MAYMOVE
     xor     r8, r8
     xor     r9, r9
     syscall
+    pop     r10
+    pop     r9
+    pop     r8
     cmp     rax, -4096
     ja      error_exit
     ret
