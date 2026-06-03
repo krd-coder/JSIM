@@ -55,7 +55,6 @@ section .bss
 section .data
     newline_char    db 10
     error_msg       db "ERROR", 10      ; Dodajemy komunikat błędu (ERROR + Enter)
-    newline_char    db 10       ; Znak nowej linii do wypisania na końcu
 
 ; ==============================================================================
 ; Sekcja kodu
