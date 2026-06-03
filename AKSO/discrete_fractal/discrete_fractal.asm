@@ -347,7 +347,8 @@ build_next_generation:
 
     ; 4. Pobierz znak składowy ze starej reguły
     mov     rdi, [rel rule_buf]
-    movzx   eax, byte [rdi + rsi + rcx] ; eax = kod ASCII pojedynczego znaku zastępczego
+    add     rdi, rsi                    ; Dodajemy offset bezpośrednio do bazy (rdi = rule_buf + offset)
+    movzx   eax, byte [rdi + rcx]       ; Teraz w nawiasach są tylko 2 rejestry - wszystko gra!
 
     ; 5. Sprawdź, na co TEN znak przechodzi w obecnej generacji (Rule Composition)
     lea     rdx, [rel rule_lens]
