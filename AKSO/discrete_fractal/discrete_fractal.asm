@@ -53,6 +53,8 @@ section .bss
 ; Sekcja danych zainicjowanych
 ; ==============================================================================
 section .data
+    newline_char    db 10
+    error_msg       db "ERROR", 10      ; Dodajemy komunikat błędu (ERROR + Enter)
     newline_char    db 10       ; Znak nowej linii do wypisania na końcu
 
 ; ==============================================================================
@@ -127,13 +129,15 @@ _start:
     mov     rdx, [rel axiom_cap]
     cmp     rsi, rdx
     jl      .no_axiom_realloc
-    shl     rdx, 1                      ; Podwojenie pojemności bufora
+    push    rax                         ; <--- 1. Zabezpiecz wczytany znak przed mremap!
+    shl     rdx, 1
     call    do_mremap
     mov     [rel axiom_buf], rax
     mov     [rel axiom_cap], rdx
     mov     rdi, rax
+    pop     rax                         ; <--- 2. Przywróć znak z powrotem do AL!
 .no_axiom_realloc:
-    mov     byte [rdi + rsi], al        ; Dodanie znaku na końcu bufora
+    mov     byte [rdi + rsi], al        ; Teraz wczytany znak jest bezpieczny
     inc     qword [rel axiom_len]
     jmp     .read_axiom_loop
 .axiom_done:
@@ -180,15 +184,17 @@ _start:
     mov     rdx, [rel rule_cap]
     cmp     rsi, rdx
     jl      .no_rule_realloc
+    push    rax                         ; <--- 1. Zabezpiecz znak
     push    rbx                         ; Zachowanie kodu znaku aktualnej reguły
-    shl     rdx, 1                      ; Nowy rozmiar: rdx = stary * 2
+    shl     rdx, 1
     call    do_mremap
     mov     [rel rule_buf], rax
     mov     [rel rule_cap], rdx
     mov     rdi, rax
     pop     rbx
+    pop     rax                         ; <--- 2. Przywróć znak
 .no_rule_realloc:
-    mov     byte [rdi + rsi], al        ; Dopisanie znaku
+    mov     byte [rdi + rsi], al
     inc     qword [rel rule_len]
     lea     rdx, [rel rule_lens]
     inc     qword [rdx + rbx * 8]       ; Inkrementacja długości ciągu dla danej reguły
@@ -506,6 +512,12 @@ _start:
 
 ; error_exit - wyjście awaryjne (czyści używaną pamięć i kończy jako błąd z 1)
 error_exit:
+    mov     rax, SYS_WRITE
+    mov     rdi, 2                      ; 2 = STDERR (Standard Error)
+    lea     rsi, [rel error_msg]
+    mov     rdx, 6                      ; Długość napisu "ERROR\n"
+    syscall
+
     call    cleanup
     mov     rax, SYS_EXIT
     mov     rdi, 1
