@@ -296,14 +296,16 @@ _start:
     jmp     .copy_loop
 .copy_done:
 
-    ; 7d. Czyszczenie starego bufora iteracyjnego i zastępowanie wskaźników
+; 7d. Czyszczenie starego bufora iteracyjnego i zastępowanie wskaźników
+    push    r11                         ; ZABEZPIECZ r11 przed zniszczeniem przez syscall!
     mov     rdi, [rel axiom_buf]
     mov     rsi, [rel axiom_cap]
     call    do_munmap
+    pop     r11                         ; PRZYWRÓĆ r11 (znów mamy prawidłowy wskaźnik)
     
     mov     [rel axiom_buf], r11
     mov     [rel axiom_len], r9
-    mov     [rel axiom_cap], r9         ; Ustawienie nowej zdolności jako r9
+    mov     [rel axiom_cap], r9
 
 
 
