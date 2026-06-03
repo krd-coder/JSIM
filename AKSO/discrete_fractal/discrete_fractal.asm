@@ -63,6 +63,7 @@ section .text
     global _start
 
 _start:
+    cld                                 ; <--- LUKA 3: Zabezpieczenie kierunku pamięci
     ; 1. Weryfikacja liczby argumentów programu (argc)
     mov     rdi, [rsp]                  ; argc
     cmp     rdi, 2                      ; Oczekujemy dokładnie 2 argumentów (nazwa + parametr n)
@@ -82,7 +83,9 @@ _start:
     jg      error_exit
     sub     eax, '0'                    ; Konwersja znaku ASCII na wartość
     imul    r12, 10                     ; r12 = r12 * 10
+    jo      error_exit                  ; <--- LUKA 2: Wychwycenie przepełnienia mnożenia
     add     r12, rax                    ; r12 = r12 + cyfra
+    jc      error_exit                  ; <--- LUKA 2: Wychwycenie przepełnienia dodawania
     mov     r15, 0xFFFFFFFF             ; Maksymalna wartość to 2^32 - 1
     cmp     r12, r15
     ja      error_exit                  ; Błąd, jeśli przekroczono zakres
@@ -128,15 +131,13 @@ _start:
     mov     rdx, [rel axiom_cap]
     cmp     rsi, rdx
     jl      .no_axiom_realloc
-    push    rax                         ; <--- 1. Zabezpiecz wczytany znak przed mremap!
-    shl     rdx, 1
+    shl     rdx, 1                      ; Podwojenie pojemności bufora
     call    do_mremap
     mov     [rel axiom_buf], rax
     mov     [rel axiom_cap], rdx
     mov     rdi, rax
-    pop     rax                         ; <--- 2. Przywróć znak z powrotem do AL!
 .no_axiom_realloc:
-    mov     byte [rdi + rsi], al        ; Teraz wczytany znak jest bezpieczny
+    mov     byte [rdi + rsi], al        ; Dodanie znaku na końcu bufora
     inc     qword [rel axiom_len]
     jmp     .read_axiom_loop
 .axiom_done:
@@ -183,22 +184,23 @@ _start:
     mov     rdx, [rel rule_cap]
     cmp     rsi, rdx
     jl      .no_rule_realloc
-    push    rax                         ; <--- 1. Zabezpiecz znak
     push    rbx                         ; Zachowanie kodu znaku aktualnej reguły
-    shl     rdx, 1
+    shl     rdx, 1                      ; Nowy rozmiar: rdx = stary * 2
     call    do_mremap
     mov     [rel rule_buf], rax
     mov     [rel rule_cap], rdx
     mov     rdi, rax
     pop     rbx
-    pop     rax                         ; <--- 2. Przywróć znak
 .no_rule_realloc:
-    mov     byte [rdi + rsi], al
+    mov     byte [rdi + rsi], al        ; Dopisanie znaku
     inc     qword [rel rule_len]
     lea     rdx, [rel rule_lens]
     inc     qword [rdx + rbx * 8]       ; Inkrementacja długości ciągu dla danej reguły
     jmp     .read_rule_body_loop
 .rule_done:
+    lea     rdx, [rel rule_lens]        ; <--- LUKA 1: Weryfikacja pustej reguły
+    cmp     qword [rdx + rbx * 8], 0    
+    je      error_exit                  ; Jeśli wyczytany rozwinięcie ma długość 0 to rzuć ERROR
     jmp     .read_rules_loop
 .rules_eof:
     ; 6. Uzupełnienie reguł domyślnych dla znaków bez określonej reguły (znak przechodzi na samego siebie)
