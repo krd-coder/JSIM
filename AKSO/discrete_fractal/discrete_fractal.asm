@@ -37,6 +37,13 @@ section .bss
     rule_lens       resq 256    ; Długości ciągów zamieniających dla danego znaku
     rule_has        resb 256    ; Flagi oznaczające zdefiniowanie reguły (0 lub 1)
 
+    ; Bufory dla "nowej generacji" reguł podczas ich potęgowania
+    next_rule_buf       resq 1
+    next_rule_cap       resq 1
+    next_rule_len       resq 1
+    next_rule_offsets   resq 256
+    next_rule_lens      resq 256
+
     ; Bufor i wskaźniki dla czytania ze standardowego wejścia
     io_buf          resb IO_BUF_SIZE
     io_buf_ptr      resq 1
@@ -96,6 +103,12 @@ _start:
     mov     [rel rule_buf], rax
     mov     qword [rel rule_cap], INIT_CAPACITY
     mov     qword [rel rule_len], 0
+
+    mov     rdi, INIT_CAPACITY
+    call    mmap_alloc
+    mov     [rel next_rule_buf], rax
+    mov     qword [rel next_rule_cap], INIT_CAPACITY
+    mov     qword [rel next_rule_len], 0
 
     ; 4. Wczytanie pierwszej linii (aksjomat - napis początkowy)
 .read_axiom_loop:
@@ -419,7 +432,7 @@ swap_generations:
 
 
 
-    jnz     .iter_loop
+    jmp     .iter_loop
 
     ; 8. Wypisywanie wyniku i wyjście
 .output:
@@ -455,6 +468,9 @@ cleanup:
     call    do_munmap
     mov     rdi, [rel rule_buf]
     mov     rsi, [rel rule_cap]
+    call    do_munmap
+    mov     rdi, [rel next_rule_buf]
+    mov     rsi, [rel next_rule_cap]
     call    do_munmap
     ret
 
