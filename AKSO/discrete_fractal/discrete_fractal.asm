@@ -236,7 +236,7 @@ _start:
     ; 7. Generowanie zadanego stopnia L-systemu (iteracje)
 .iter_loop:
     shr     r12, 1                      ; Dekrementacja licznika iteracji
-    jnc     build_next_generation
+    jnc     .build_next_generation
 
     mov     r8, [rel axiom_len]
     test    r8, r8
@@ -315,7 +315,7 @@ _start:
 ; Wyjście: next_rule_buf, next_rule_offsets, next_rule_lens
 ; ==============================================================================
 
-build_next_generation:
+.build_next_generation:
     test    r12, r12
     jz      .output                     ; Brak iteracji - natychmiastowe wypisanie
     xor     rbx, rbx                    ; rbx = aktualnie rozpatrywany znak ASCII (0-255)
@@ -394,7 +394,7 @@ build_next_generation:
 ; Sekcja zamiany generacji (Swapping & Metadata Copy)
 ; Przenosi dane z 'next_rule' do głównych struktur 'rule'
 ; ==============================================================================
-swap_generations:
+.swap_generations:
     ; 1. Zamiana wskaźników buforów (rule_buf <-> next_rule_buf)
     ; Używamy rejestru RAX jako tymczasowego pośrednika
     mov     rax, [rel rule_buf]
