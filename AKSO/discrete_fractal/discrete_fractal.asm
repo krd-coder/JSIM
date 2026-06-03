@@ -257,11 +257,16 @@ _start:
     jmp     .calc_loop
 .calc_done:
 
-    ; 7b. Alokacja idealnie dopasowanego bufora dla nowej iteracji (new_buf)
+; 7b. Alokacja idealnie dopasowanego bufora dla nowej iteracji (new_buf)
     test    r9, r9
     jz      .empty_new_buf
+    
     mov     rdi, r9                     ; Nowy rozmiar (w rdi)
+    
+    push    r9                          ; ZABEZPIECZ R9 (nową długość) przed mmap_alloc!
     call    mmap_alloc
+    pop     r9                          ; PRZYWRÓĆ R9!
+    
     mov     r11, rax                    ; r11 = wskaźnik na nowy bufor
     jmp     .do_copy
 .empty_new_buf:
