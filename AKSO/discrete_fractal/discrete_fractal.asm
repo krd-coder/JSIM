@@ -356,8 +356,48 @@ _start:
     test    r9, r9
     jz      .skip_copy                  ; Jeśli zamienia się na puste, pomiń
 
-    ; [TUTAJ: NALEŻY WSTAWIĆ SPRAWDZENIE POJEMNOŚCI next_rule_cap I EW. MREMAP]
-    ; Ponieważ długości rosną lawinowo, ten krok jest krytyczny!
+
+
+; --- POCZĄTEK ZARZĄDZANIA POJEMNOŚCIĄ ---
+    ; Sprawdzamy, czy nowa długość całkowita zmieści się w buforze
+    mov     rax, [rel next_rule_len]
+    add     rax, r9                     ; rax = przewidywana długość (stara + długość dodawanego znaku)
+    mov     rdi, [rel next_rule_cap]
+    cmp     rax, rdi
+    jle     .capacity_ok                ; Jeśli się mieści, pomiń realokację
+
+.realloc_loop:
+    shl     rdi, 1                      ; Podwajamy pojemność (rdi = rdi * 2)
+    cmp     rdi, rax
+    jl      .realloc_loop               ; Powtarzaj podwajanie, aż pomieścimy znak (szczególnie przy ogromnym wzroście)
+
+    ; Zabezpieczamy rejestry (ponieważ mremap i wywołanie systemowe nadpiszą wiele z nich)
+    push    rax
+    push    rcx
+    push    rsi
+    push    r9
+    push    rdi                         ; push nowej pojemności
+
+    ; Wywołanie systemowe powiększenia pamięci (mremap)
+    mov     rdx, rdi                    ; rdx = nowa pojemność
+    mov     rdi, [rel next_rule_buf]    ; rdi = stary wskaźnik
+    mov     rsi, [rel next_rule_cap]    ; rsi = stara pojemność
+    call    do_mremap                   ; RAX zwróci nowy wskaźnik
+
+    ; Aktualizujemy wskaźniki i metadane po udanym rozszerzeniu
+    mov     [rel next_rule_buf], rax
+    pop     qword [rel next_rule_cap]   ; Ściągamy ze stosu bezpośrednio do zmiennej nową pojemność
+
+    ; Przywracamy resztę rejestrów pętli
+    pop     r9
+    pop     rsi
+    pop     rcx
+    pop     rax
+
+.capacity_ok:
+    ; --- KONIEC ZARZĄDZANIA POJEMNOŚCIĄ ---
+
+
 
     ; 6. Skopiuj rozwinięcie tego znaku do nowego bufora reguł (rep movsb)
     push    rsi                         ; Zabezpiecz stare wskaźniki
