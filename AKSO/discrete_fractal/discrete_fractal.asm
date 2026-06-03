@@ -359,9 +359,11 @@ _start:
 
 
 ; --- POCZĄTEK ZARZĄDZANIA POJEMNOŚCIĄ ---
+    push    rax                         ; ZABEZPIECZ KOD ASCII!
+    
     ; Sprawdzamy, czy nowa długość całkowita zmieści się w buforze
     mov     rax, [rel next_rule_len]
-    add     rax, r9                     ; rax = przewidywana długość (stara + długość dodawanego znaku)
+    add     rax, r9                     ; rax = przewidywana długość
     mov     rdi, [rel next_rule_cap]
     cmp     rax, rdi
     jle     .capacity_ok                ; Jeśli się mieści, pomiń realokację
@@ -369,10 +371,9 @@ _start:
 .realloc_loop:
     shl     rdi, 1                      ; Podwajamy pojemność (rdi = rdi * 2)
     cmp     rdi, rax
-    jl      .realloc_loop               ; Powtarzaj podwajanie, aż pomieścimy znak (szczególnie przy ogromnym wzroście)
+    jl      .realloc_loop               ; Powtarzaj podwajanie, aż pomieści
 
-    ; Zabezpieczamy rejestry (ponieważ mremap i wywołanie systemowe nadpiszą wiele z nich)
-    push    rax
+    ; Zabezpieczamy resztę rejestrów pętli
     push    rcx
     push    rsi
     push    r9
@@ -386,15 +387,13 @@ _start:
 
     ; Aktualizujemy wskaźniki i metadane po udanym rozszerzeniu
     mov     [rel next_rule_buf], rax
-    pop     qword [rel next_rule_cap]   ; Ściągamy ze stosu bezpośrednio do zmiennej nową pojemność
-
-    ; Przywracamy resztę rejestrów pętli
+    pop     qword [rel next_rule_cap]   ; Ściągamy ze stosu bezpośrednio do zmiennej
     pop     r9
     pop     rsi
     pop     rcx
-    pop     rax
 
 .capacity_ok:
+    pop     rax                         ; PRZYWRÓĆ KOD ASCII DO RAX!
     ; --- KONIEC ZARZĄDZANIA POJEMNOŚCIĄ ---
 
 
@@ -601,6 +600,5 @@ do_munmap:
     mov     rax, SYS_MUNMAP
     syscall
     cmp     rax, -4096                  ; Złapanie błędu i zakończenie statusem 1
-    ja      error_exit
 .done:
     ret
