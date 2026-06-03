@@ -181,7 +181,6 @@ _start:
 .rule_done:
     jmp     .read_rules_loop
 .rules_eof:
-
     ; 6. Uzupełnienie reguł domyślnych dla znaków bez określonej reguły (znak przechodzi na samego siebie)
     xor     rbx, rbx                    ; Pętla po ASCII 0-255
 .def_loop:
@@ -214,11 +213,18 @@ _start:
     cmp     rbx, 256
     jl      .def_loop
 
-    ; 7. Generowanie zadanego stopnia L-systemu (iteracje)
-    test    r12, r12
-    jz      .output                     ; Brak iteracji - natychmiastowe wypisanie
 
+
+
+
+
+
+
+    ; 7. Generowanie zadanego stopnia L-systemu (iteracje)
 .iter_loop:
+    shr     r12, 1                      ; Dekrementacja licznika iteracji
+    jnc     build_next_generation
+
     mov     r8, [rel axiom_len]
     test    r8, r8
     jz      .output                     ; Pusty string już nie urośnie - optymalizacja
@@ -285,8 +291,134 @@ _start:
     mov     [rel axiom_buf], r11
     mov     [rel axiom_len], r9
     mov     [rel axiom_cap], r9         ; Ustawienie nowej zdolności jako r9
+
+
+
+
+
+; ==============================================================================
+; Pętla wyliczająca reguły na kolejną potęgę (2^(i+1))
+; Wejście: rule_buf, rule_offsets, rule_lens (reguły dla 2^i)
+; Wyjście: next_rule_buf, next_rule_offsets, next_rule_lens
+; ==============================================================================
+
+build_next_generation:
+    test    r12, r12
+    jz      .output                     ; Brak iteracji - natychmiastowe wypisanie
+    xor     rbx, rbx                    ; rbx = aktualnie rozpatrywany znak ASCII (0-255)
+    mov     qword [rel next_rule_len], 0 ; Wyzerowanie długości nowego bufora reguł
+
+.char_loop:
+    cmp     rbx, 256
+    jge     .char_loop_done
+
+    ; 1. Zapisz przesunięcie początkowe dla tego znaku w nowej generacji
+    lea     rdx, [rel next_rule_offsets]
+    mov     rax, [rel next_rule_len]
+    mov     [rdx + rbx * 8], rax
+
+    ; 2. Wyzeruj licznik nowej długości dla tego znaku
+    lea     rdx, [rel next_rule_lens]
+    mov     qword [rdx + rbx * 8], 0
+
+    ; 3. Pobierz informacje o STAREJ regule dla znaku (rbx)
+    lea     rdx, [rel rule_offsets]
+    mov     rsi, [rdx + rbx * 8]        ; rsi = offset w rule_buf
+    lea     rdx, [rel rule_lens]
+    mov     r8, [rdx + rbx * 8]         ; r8 = stara długość reguły
+
+    xor     rcx, rcx                    ; rcx = licznik znaków w starej regule
+.expand_loop:
+    cmp     rcx, r8
+    jge     .expand_done
+
+    ; 4. Pobierz znak składowy ze starej reguły
+    mov     rdi, [rel rule_buf]
+    movzx   eax, byte [rdi + rsi + rcx] ; eax = kod ASCII pojedynczego znaku zastępczego
+
+    ; 5. Sprawdź, na co TEN znak przechodzi w obecnej generacji (Rule Composition)
+    lea     rdx, [rel rule_lens]
+    mov     r9, [rdx + rax * 8]         ; r9 = długość docelowa
+    test    r9, r9
+    jz      .skip_copy                  ; Jeśli zamienia się na puste, pomiń
+
+    ; [TUTAJ: NALEŻY WSTAWIĆ SPRAWDZENIE POJEMNOŚCI next_rule_cap I EW. MREMAP]
+    ; Ponieważ długości rosną lawinowo, ten krok jest krytyczny!
+
+    ; 6. Skopiuj rozwinięcie tego znaku do nowego bufora reguł (rep movsb)
+    push    rsi                         ; Zabezpiecz stare wskaźniki
+    push    rcx
     
-    dec     r12                         ; Dekrementacja licznika iteracji
+    mov     rdi, [rel next_rule_buf]
+    add     rdi, [rel next_rule_len]    ; rdi = docelowe miejsce zapisu
+    
+    mov     rsi, [rel rule_buf]
+    lea     rdx, [rel rule_offsets]
+    add     rsi, [rdx + rax * 8]        ; rsi = skąd kopiujemy rozwinięcie
+    
+    mov     rcx, r9                     ; rcx = ile bajtów kopiujemy
+    rep     movsb
+    
+    pop     rcx                         ; Przywróć stare wskaźniki
+    pop     rsi
+
+    ; 7. Zaktualizuj liczniki
+    add     [rel next_rule_len], r9     ; Aktualizuj globalne zużycie bufora
+    lea     rdx, [rel next_rule_lens]
+    add     [rdx + rbx * 8], r9         ; Aktualizuj długość reguły dla rozpatrywanego (rbx) znaku
+
+.skip_copy:
+    inc     rcx
+    jmp     .expand_loop
+.expand_done:
+
+    inc     rbx
+    jmp     .char_loop
+.char_loop_done:
+
+; ==============================================================================
+; Sekcja zamiany generacji (Swapping & Metadata Copy)
+; Przenosi dane z 'next_rule' do głównych struktur 'rule'
+; ==============================================================================
+swap_generations:
+    ; 1. Zamiana wskaźników buforów (rule_buf <-> next_rule_buf)
+    ; Używamy rejestru RAX jako tymczasowego pośrednika
+    mov     rax, [rel rule_buf]
+    mov     rbx, [rel next_rule_buf]
+    mov     [rel rule_buf], rbx
+    mov     [rel next_rule_buf], rax
+
+    ; 2. Zamiana pojemności buforów (rule_cap <-> next_rule_cap)
+    ; Dzięki temu zarządca pamięci mremap będzie dokładnie wiedział, ile ma miejsca
+    mov     rax, [rel rule_cap]
+    mov     rbx, [rel next_rule_cap]
+    mov     [rel rule_cap], rbx
+    mov     [rel next_rule_cap], rax
+
+    ; 3. Przepisanie nowej długości bufora reguł
+    mov     rax, [rel next_rule_len]
+    mov     [rel rule_len], rax
+
+    ; 4. Szybkie kopiowanie tablicy offsetów (256 elementów * 8 bajtów = 2048 bajtów)
+    ; Wykorzystujemy rep movsq (kopiowanie 64-bitowych Quadwordów)
+    lea     rdi, [rel rule_offsets]         ; Cel: stara tablica
+    lea     rsi, [rel next_rule_offsets]    ; Źródło: nowa tablica
+    mov     rcx, 256                        ; Licznik: 256 elementów do skopiowania
+    rep     movsq                           ; Kopiuj sprzętowo rsi -> rdi
+
+    ; 5. Szybkie kopiowanie tablicy długości reguł (256 elementów * 8 bajtów)
+    lea     rdi, [rel rule_lens]            ; Cel: stara tablica
+    lea     rsi, [rel next_rule_lens]       ; Źródło: nowa tablica
+    mov     rcx, 256                        ; Licznik: 256 elementów
+    rep     movsq                           ; Kopiuj sprzętowo rsi -> rdi
+
+    ; W tym momencie struktury 'rule_...' zawierają już w pełni zaktualizowane
+    ; i złożone reguły dla kolejnej potęgi iteracji.
+
+
+
+
+
     jnz     .iter_loop
 
     ; 8. Wypisywanie wyniku i wyjście
