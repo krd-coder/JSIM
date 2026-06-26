@@ -14,11 +14,11 @@ import duzeZadanie.sportowcy.Sportowiec;
 
 // Zakładane importy z dostarczonej paczki GeneratorMapek (dostosuj do struktury projektu)
 import generatorMapek.GeneratorMapek;
-import generatorMapek.WyjatekSystemuPlikow;
-import generatorMapek.StylWezla;
-import generatorMapek.GruboscKonturu;
-import generatorMapek.StylKrawedzi;
-import generatorMapek.StylLinii;
+import generatorMapek.pliki.WyjatekSystemuPlikow;
+import generatorMapek.styl.StylWezla;
+import generatorMapek.styl.GruboscKonturu;
+import generatorMapek.styl.StylKrawedzi;
+import generatorMapek.styl.StylLinii;
 
 import java.util.Arrays;
 import java.util.List;
@@ -174,7 +174,7 @@ public class Symulacja {
      */
     private void rysujWezly(GeneratorMapek generator, Osrodek osrodek) {
         for (Wezel w : osrodek.wezly()) {
-            StylWezla styl = w.czySkomunikowany() ? 
+            StylWezla styl = w.czyStartowy() ? 
                              new StylWezla(GruboscKonturu.POGRUBIONY) : 
                              new StylWezla(GruboscKonturu.ZWYKLY);
                              

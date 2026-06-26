@@ -7,7 +7,7 @@ import duzeZadanie.sportowcy.Sportowiec;
  */
 public interface KolejkaSportowcow {
 
-    void dodaj(Sportowiec sportowiec, Moment moment);
+    void dodaj(Sportowiec sportowiec);
 
     Sportowiec[] zdejmij(int ile);
 

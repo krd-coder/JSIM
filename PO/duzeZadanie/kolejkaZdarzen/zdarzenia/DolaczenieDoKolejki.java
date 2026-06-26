@@ -30,7 +30,7 @@ public class DolaczenieDoKolejki extends Zdarzenie {
         dziennik
             .dodajWpisZeSportowcem(moment, sportowiec, String.format("dołączył do kolejki w %s", wyciag.toString()));
 
-        wyciag.dodajDoKolejki(sportowiec);
+        wyciag.dodajDoKolejki(sportowiec, moment()); // Przekazujemy moment do metody dodajDoKolejki
 
         return new Zdarzenie[0];
     }

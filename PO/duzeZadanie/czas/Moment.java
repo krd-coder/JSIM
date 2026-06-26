@@ -41,8 +41,11 @@ public class Moment {
     }
 
     public long odlegloscWSekundach(Moment inny) {
-    // Oblicz i zwróć (w sekundach) różnicę między 'this' a 'inny'
-    return Math.abs(this.czasWsekundach() - inny.czasWsekundach()); 
+    // Zakładam, że Moment ma pola godzina, minuta, sekunda. Jeśli nazywają się inaczej - popraw je.
+    long tenCzas = this.godzina * 3600L + this.minuta * 60L + this.sekunda;
+    long innyCzas = inny.godzina * 3600L + inny.minuta * 60L + inny.sekunda;
+    return Math.abs(tenCzas - innyCzas);
+}
 }
 
     private int sekundy() {
