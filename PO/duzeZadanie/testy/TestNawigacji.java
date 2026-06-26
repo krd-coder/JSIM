@@ -1,9 +1,9 @@
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import duzeZadanie.BFS.NawigacjaBFS;
 import duzeZadanie.osrodek.Wezel;
 import duzeZadanie.osrodek.krawedz.Trasa;
-import duzeZadanie.osrodek.krawedz.Wyciag;
+import duzeZadanie.osrodek.krawedz.wyciag.Wyciag;
 import duzeZadanie.osrodek.Osrodek;
 import duzeZadanie.czas.Interwal;
 
