@@ -3,6 +3,7 @@ package duzeZadanie.sportowcy;
 import duzeZadanie.czas.Interwal;
 import duzeZadanie.czas.Moment;
 import duzeZadanie.losowosc.MaszynaLosujaca;
+import duzeZadanie.osrodek.Osrodek;
 import duzeZadanie.osrodek.Wezel;
 import duzeZadanie.osrodek.krawedz.Krawedz;
 import duzeZadanie.osrodek.krawedz.Trasa;
@@ -60,7 +61,7 @@ public class KolekcjonerSportowiec extends PlanujacySportowiec {
     @Override
     protected Krawedz wylosujKrawedzZWezla(Wezel wezel) {
         List<Krawedz> wszystkie = wezel.pobierzWszystkieWychodzace();
-        return wszystkie.get(maszynaLosujaca.losujCalkowita(0, wszystkie.size() - 1));
+        return wszystkie.get(maszynaLosujaca.losowyInt(0, wszystkie.size() - 1));
     }
 
     @Override

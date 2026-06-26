@@ -27,7 +27,7 @@ public class LokalnySportowiec extends Sportowiec {
         // Sprawdzanie decyzji spontanicznej
         if (maszynaLosujaca.losujPrawdopodobienstwo() < wspolczynnikSpontanicznosci) {
             List<Krawedz> wszystkieKrawedzie = obecnyWezel.pobierzWszystkieWychodzace();
-            int wylosowanyIndeks = maszynaLosujaca.losujCalkowita(0, wszystkieKrawedzie.size() - 1);
+            int wylosowanyIndeks = maszynaLosujaca.losowyInt(0, wszystkieKrawedzie.size() - 1);
             Krawedz losowa = wszystkieKrawedzie.get(wylosowanyIndeks);
             
             if (losowa instanceof Trasa) return nastepnyKrokTrasa(moment, (Trasa) losowa);

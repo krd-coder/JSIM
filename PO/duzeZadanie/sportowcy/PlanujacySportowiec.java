@@ -39,7 +39,7 @@ public abstract class PlanujacySportowiec extends Sportowiec {
 
             // Ułożenie nowego planu
             Trasa cel = znajdzTraseDocelowa(obecnyWezel);
-            List<Krawedz> trasaBFS = NawigacjaBFS.WyznaczPlan(obecnyWezel, cel.pobierzPoczatek());
+            List<Krawedz> trasaBFS = NawigacjaBFS.WyznaczPlan(obecnyWezel, cel.poczatek());
             
             aktualnyPlan.addAll(trasaBFS);
             aktualnyPlan.add(cel); // Dodajemy sam zjazd na koniec planu
