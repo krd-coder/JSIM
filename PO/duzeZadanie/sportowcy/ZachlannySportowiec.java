@@ -44,8 +44,8 @@ public class ZachlannySportowiec extends PlanujacySportowiec {
 
     @Override
     protected Krawedz wylosujKrawedzZWezla(Wezel wezel) {
-        List<Krawedz> wszystkie = wezel.pobierzWszystkieWychodzace();
-        return wszystkie.get(maszynaLosujaca.losowyInt(0, wszystkie.size() - 1));
+        Krawedz[] wszystkie = wezel.pobierzWszystkieWychodzace();
+        return wszystkie[maszynaLosujaca.losowyInt(0, wszystkie.length - 1)];
     }
 
     @Override

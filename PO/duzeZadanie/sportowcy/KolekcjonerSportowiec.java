@@ -62,14 +62,14 @@ public class KolekcjonerSportowiec extends PlanujacySportowiec {
 
     @Override
     protected Krawedz wylosujKrawedzZWezla(Wezel wezel) {
-        List<Krawedz> wszystkie = wezel.pobierzWszystkieWychodzace();
-        return wszystkie.get(maszynaLosujaca.losowyInt(0, wszystkie.size() - 1));
+        Krawedz[] wszystkie = wezel.pobierzWszystkieWychodzace();
+        return wszystkie[maszynaLosujaca.losowyInt(0, wszystkie.length - 1)];
     }
 
     @Override
     public Sportowiec kopia(int przesuniecieId, Interwal przesuniecieMomentuStartu) {
         return new KolekcjonerSportowiec(this.id + przesuniecieId, poziomZaawansowania, wspolczynnikSpontanicznosci,
                 wspolczynnikTrudnosci, wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia,
-                sledzony, wezelStartowy, momentStartu.dodaj(przesuniecieMomentuStartu), maszynaLosujaca, osrodek);
+                sledzony, wezelStartowy, momentStartu.dodajInterwal(przesuniecieMomentuStartu), maszynaLosujaca, osrodek);
     }
 }
