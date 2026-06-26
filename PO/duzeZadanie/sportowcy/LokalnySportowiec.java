@@ -5,82 +5,70 @@ import duzeZadanie.czas.Moment;
 import duzeZadanie.kolejkaZdarzen.zdarzenia.Zdarzenie;
 import duzeZadanie.losowosc.MaszynaLosujaca;
 import duzeZadanie.osrodek.Wezel;
+import duzeZadanie.osrodek.krawedz.Krawedz;
 import duzeZadanie.osrodek.krawedz.Trasa;
 import duzeZadanie.osrodek.krawedz.wyciag.Wyciag;
 
+import java.util.List;
+
 public class LokalnySportowiec extends Sportowiec {
 
-    public LokalnySportowiec(int id, int poziomZaawansowania, double wspolczynnikSpontanicznosci, 
-                             double wspolczynnikTrudnosci, double wspolczynnikNawierzchni, 
-                             double wspolczynnikZnudzenia, double wagaZnudzenia, boolean sledzony, 
+    public LokalnySportowiec(int id, int poziomZaawansowania, double wspolczynnikSpontanicznosci,
+                             double wspolczynnikTrudnosci, double wspolczynnikNawierzchni,
+                             double wspolczynnikZnudzenia, double wagaZnudzenia, boolean sledzony,
                              Wezel wezelStartowy, Moment momentStartu, MaszynaLosujaca maszynaLosujaca) {
-        super(id, poziomZaawansowania, wspolczynnikSpontanicznosci, wspolczynnikTrudnosci, 
-              wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia, sledzony, 
+        super(id, poziomZaawansowania, wspolczynnikSpontanicznosci, wspolczynnikTrudnosci,
+              wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia, sledzony,
               wezelStartowy, momentStartu, maszynaLosujaca);
     }
 
     @Override
     public Zdarzenie nastepnyKrok(Moment moment, Wezel obecnyWezel) {
-        if (maszynaLosujaca.losowyDouble(0, 1) < wspolczynnikSpontanicznosci) {
-            return podejmijSpontanicznaDecyzje(moment, obecnyWezel);
-        } else {
-            return podejmijPrzemyslanaDecyzje(moment, obecnyWezel);
+        // Sprawdzanie decyzji spontanicznej
+        if (maszynaLosujaca.losujPrawdopodobienstwo() < wspolczynnikSpontanicznosci) {
+            List<Krawedz> wszystkieKrawedzie = obecnyWezel.pobierzWszystkieWychodzace();
+            int wylosowanyIndeks = maszynaLosujaca.losujCalkowita(0, wszystkieKrawedzie.size() - 1);
+            Krawedz losowa = wszystkieKrawedzie.get(wylosowanyIndeks);
+            
+            if (losowa instanceof Trasa) return nastepnyKrokTrasa(moment, (Trasa) losowa);
+            return nastepnyKrokWyciag(moment, (Wyciag) losowa);
         }
-    }
 
-    private Zdarzenie podejmijSpontanicznaDecyzje(Moment moment, Wezel obecnyWezel) {
-        Trasa[] bezposrednieTrasy = obecnyWezel.wychodzaceTrasy();
-        Wyciag[] wyciagi = obecnyWezel.wychodzaceWyciagi();
-        int losowyWybor = maszynaLosujaca.losowyInt(0, bezposrednieTrasy.length + wyciagi.length);
+        Krawedz najlepszyWybor = null;
+        double maxAtrakcyjnosc = -1.0;
 
-        if (losowyWybor < bezposrednieTrasy.length) {
-            return nastepnyKrokTrasa(moment, bezposrednieTrasy[losowyWybor]);
-        } else {
-            return nastepnyKrokWyciag(moment, wyciagi[losowyWybor - bezposrednieTrasy.length]);
-        }
-    }
-
-    private Zdarzenie podejmijPrzemyslanaDecyzje(Moment moment, Wezel obecnyWezel) {
-        Trasa[] bezposrednieTrasy = obecnyWezel.wychodzaceTrasy();
-        Wyciag[] wyciagi = obecnyWezel.wychodzaceWyciagi();
-
-        double najwiekszaAtrakcyjnosc = -1;
-        Trasa najlepszaTrasa = null;
-        Wyciag nastepnyWyciag = null;
-
-        for (Trasa trasa : bezposrednieTrasy) {
+        // Trasy bezpośrednio z węzła
+        for (Trasa trasa : obecnyWezel.pobierzTrasy()) {
             double atrakcyjnosc = lacznaAtrakcyjnosc(trasa);
-            if (atrakcyjnosc > najwiekszaAtrakcyjnosc) {
-                najwiekszaAtrakcyjnosc = atrakcyjnosc;
-                najlepszaTrasa = trasa;
-                nastepnyWyciag = null; // Resetujemy wyciąg, jeśli wybrano trasę z obecnego węzła
+            if (atrakcyjnosc > maxAtrakcyjnosc) {
+                maxAtrakcyjnosc = atrakcyjnosc;
+                najlepszyWybor = trasa;
             }
         }
 
-        for (Wyciag wyciag : wyciagi) {
-            for (Trasa trasa : wyciag.koniec().wychodzaceTrasy()) {
-                double atrakcyjnosc = lacznaAtrakcyjnosc(trasa);
-                if (atrakcyjnosc > najwiekszaAtrakcyjnosc) {
-                    najwiekszaAtrakcyjnosc = atrakcyjnosc;
-                    najlepszaTrasa = trasa;
-                    nastepnyWyciag = wyciag;
+        // Trasy dostępne z wyciągów
+        for (Wyciag wyciag : obecnyWezel.pobierzWyciagi()) {
+            Wezel gornaStacja = wyciag.pobierzKoniec();
+            for (Trasa trasaNaGorze : gornaStacja.pobierzTrasy()) {
+                double atrakcyjnosc = lacznaAtrakcyjnosc(trasaNaGorze);
+                if (atrakcyjnosc > maxAtrakcyjnosc) {
+                    maxAtrakcyjnosc = atrakcyjnosc;
+                    najlepszyWybor = wyciag; // Decydujemy się na wjazd
                 }
             }
         }
 
-        if (najlepszaTrasa == null) {
-            return nastepnyKrokWyciag(moment, wyciagi[0]);
-        } else if (nastepnyWyciag == null) {
-            return nastepnyKrokTrasa(moment, najlepszaTrasa);
+        if (najlepszyWybor instanceof Trasa) {
+            return nastepnyKrokTrasa(moment, (Trasa) najlepszyWybor);
         } else {
-            return nastepnyKrokWyciag(moment, nastepnyWyciag);
+            return nastepnyKrokWyciag(moment, (Wyciag) najlepszyWybor);
         }
     }
 
     @Override
     public Sportowiec kopia(int przesuniecieId, Interwal przesuniecieMomentuStartu) {
-        return new LokalnySportowiec(id + przesuniecieId, poziomZaawansowania, wspolczynnikSpontanicznosci,
+        return new LokalnySportowiec(this.id + przesuniecieId, poziomZaawansowania, wspolczynnikSpontanicznosci,
                 wspolczynnikTrudnosci, wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia,
-                sledzony, wezelStartowy, momentStartu.dodajInterwal(przesuniecieMomentuStartu), maszynaLosujaca);
+                sledzony, wezelStartowy, momentStartu.dodaj(przesuniecieMomentuStartu), maszynaLosujaca);
     }
 }

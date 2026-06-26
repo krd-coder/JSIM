@@ -1,32 +1,72 @@
 package duzeZadanie.sportowcy;
 
 import duzeZadanie.czas.Interwal;
-import duzeZadanie.osrodek.Osrodek;
+import duzeZadanie.czas.Moment;
+import duzeZadanie.losowosc.MaszynaLosujaca;
 import duzeZadanie.osrodek.Wezel;
+import duzeZadanie.osrodek.krawedz.Krawedz;
+import duzeZadanie.osrodek.krawedz.Trasa;
 
-public class KolekcjonerSportowiec extends Sportowiec {
-    private final Osrodek osrodek;
+import java.util.List;
 
-    public KolekcjonerSportowiec(int id, int poziomZaawansowania, double wspolczynnikSpontanicznosci, 
-                                 double wspolczynnikTrudnosci, double wspolczynnikNawierzchni, 
-                                 double wspolczynnikZnudzenia, double wagaZnudzenia, boolean sledzony, 
-                                 Wezel wezelStartowy, duzeZadanie.czas.Moment momentStartu, 
-                                 duzeZadanie.losowosc.MaszynaLosujaca maszynaLosujaca, Osrodek osrodek) {
-        super(id, poziomZaawansowania, wspolczynnikSpontanicznosci, wspolczynnikTrudnosci, 
-              wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia, sledzony, 
+public class KolekcjonerSportowiec extends PlanujacySportowiec {
+
+    public KolekcjonerSportowiec(int id, int poziomZaawansowania, double wspolczynnikSpontanicznosci,
+                                 double wspolczynnikTrudnosci, double wspolczynnikNawierzchni,
+                                 double wspolczynnikZnudzenia, double wagaZnudzenia, boolean sledzony,
+                                 Wezel wezelStartowy, Moment momentStartu, MaszynaLosujaca maszynaLosujaca) {
+        super(id, poziomZaawansowania, wspolczynnikSpontanicznosci, wspolczynnikTrudnosci,
+              wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia, sledzony,
               wezelStartowy, momentStartu, maszynaLosujaca);
-        this.osrodek = osrodek;
     }
 
     @Override
-    protected void wygenerujNowyPlan(Wezel obecnyWezel) {
-        // Tu docelowo wstawisz wywołanie BFS (podobnie jak u Zachłannego, ale szukając trasy z min. zjazdami)
+    protected Trasa znajdzTraseDocelowa(Wezel obecnyWezel) {
+        Trasa wybranaTrasa = null;
+        int minZjazdow = Integer.MAX_VALUE;
+        int minOdleglosc = Integer.MAX_VALUE;
+        double maxAtrakcyjnosc = -1.0;
+
+        List<Trasa> wszystkieTrasy = obecnyWezel.pobierzOsrodek().pobierzWszystkieTrasy();
+
+        for (Trasa trasa : wszystkieTrasy) {
+            int liczbaZjazdow = liczbaPrzejazdow(trasa);
+            
+            if (liczbaZjazdow < minZjazdow) {
+                wybranaTrasa = trasa;
+                minZjazdow = liczbaZjazdow;
+                minOdleglosc = WyszukiwarkaSciezek.obliczOdleglosc(obecnyWezel, trasa.pobierzPoczatek());
+                maxAtrakcyjnosc = lacznaAtrakcyjnosc(trasa);
+            } else if (liczbaZjazdow == minZjazdow) {
+                // Remisy rozstrzygane najpierw odległością BFS
+                int odleglosc = WyszukiwarkaSciezek.obliczOdleglosc(obecnyWezel, trasa.pobierzPoczatek());
+                if (odleglosc < minOdleglosc) {
+                    wybranaTrasa = trasa;
+                    minOdleglosc = odleglosc;
+                    maxAtrakcyjnosc = lacznaAtrakcyjnosc(trasa);
+                } else if (odleglosc == minOdleglosc) {
+                    // Remisy w odległości rozstrzygane atrakcyjnością
+                    double atrakcyjnosc = lacznaAtrakcyjnosc(trasa);
+                    if (atrakcyjnosc > maxAtrakcyjnosc) {
+                        wybranaTrasa = trasa;
+                        maxAtrakcyjnosc = atrakcyjnosc;
+                    }
+                }
+            }
+        }
+        return wybranaTrasa;
+    }
+
+    @Override
+    protected Krawedz wylosujKrawedzZWezla(Wezel wezel) {
+        List<Krawedz> wszystkie = wezel.pobierzWszystkieWychodzace();
+        return wszystkie.get(maszynaLosujaca.losujCalkowita(0, wszystkie.size() - 1));
     }
 
     @Override
     public Sportowiec kopia(int przesuniecieId, Interwal przesuniecieMomentuStartu) {
-        return new KolekcjonerSportowiec(id + przesuniecieId, poziomZaawansowania, wspolczynnikSpontanicznosci,
+        return new KolekcjonerSportowiec(this.id + przesuniecieId, poziomZaawansowania, wspolczynnikSpontanicznosci,
                 wspolczynnikTrudnosci, wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia,
-                sledzony, wezelStartowy, momentStartu.dodajInterwal(przesuniecieMomentuStartu), maszynaLosujaca, osrodek);
+                sledzony, wezelStartowy, momentStartu.dodaj(przesuniecieMomentuStartu), maszynaLosujaca);
     }
 }
