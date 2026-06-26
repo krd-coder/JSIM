@@ -24,11 +24,11 @@ public class NawigacjaBFS {
      * Struktura pomocnicza przechowująca informacje potrzebne do odtworzenia ścieżki.
      */
     private static class InfoBFS {
-        final Object krawedzWchodzaca; // Może to być Trasa lub Wyciag
+        final Krawedz krawedzWchodzaca; // Może to być Trasa lub Wyciag
         final Wezel poprzednik;
         final int odleglosc;
 
-        InfoBFS(Object krawedzWchodzaca, Wezel poprzednik, int odleglosc) {
+        InfoBFS(Krawedz krawedzWchodzaca, Wezel poprzednik, int odleglosc) {
             this.krawedzWchodzaca = krawedzWchodzaca;
             this.poprzednik = poprzednik;
             this.odleglosc = odleglosc;
@@ -39,7 +39,7 @@ public class NawigacjaBFS {
      * Główna metoda wyznaczająca najkrótszą ścieżkę algorytmem BFS.
      * Zwraca listę krawędzi (Tras i Wyciągów), które należy pokonać, by dotrzeć do celu.
      */
-    public List<Object> WyznaczPlan(Wezel start, Wezel cel) {
+    public static List<Krawedz> WyznaczPlan(Wezel start, Wezel cel) {
         // Mapa przechowująca węzły, które już odwiedziliśmy, wraz z historią "jak tam dotarliśmy"
         Map<Wezel, InfoBFS> odwiedzone = new HashMap<>();
         
@@ -88,7 +88,7 @@ public class NawigacjaBFS {
         }
 
         // 2. Odtwarzanie wyznaczonej ścieżki
-        List<Object> plan = new ArrayList<>();
+        List<Krawedz> plan = new ArrayList<>();
         
         // Zabezpieczenie przed brakiem ścieżki (choć graf w zadaniu jest silnie spójny)
         if (!znaleziono && start != cel) {

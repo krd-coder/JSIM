@@ -156,8 +156,7 @@ public abstract class Sportowiec {
 
     // W klasie Sportowiec
     public int liczbaPrzejazdow(duzeZadanie.osrodek.krawedz.Krawedz krawedz) {
-        // TODO: Zwróć liczbę przejazdów tą krawędzią
-        return 0; 
+        return licznikWszystkichZjazdow - (znudzenieTrasami.getOrDefault(krawedz, new StanZnudzenia(0.0, 0))).indeksOstatniegoZjazdu; 
     }
 
     public String pobierzHistorieKrawedzi(duzeZadanie.osrodek.krawedz.Krawedz krawedz) {

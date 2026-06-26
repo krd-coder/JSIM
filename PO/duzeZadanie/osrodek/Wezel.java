@@ -63,6 +63,13 @@ public class Wezel {
         this.wychodzaceWyciagi = wychodzaceWyciagi;
     }
 
+    public Krawedz[] pobierzWszystkieWychodzace() {
+        Krawedz[] wszystkie = new Krawedz[wychodzaceTrasy.length + wychodzaceWyciagi.length];
+        System.arraycopy(wychodzaceTrasy, 0, wszystkie, 0, wychodzaceTrasy.length);
+        System.arraycopy(wychodzaceWyciagi, 0, wszystkie, wychodzaceTrasy.length, wychodzaceWyciagi.length);
+        return wszystkie;
+    }
+
     @Override
     public String toString() {
         return String.format("Węzeł nr %d", id);
