@@ -12,6 +12,8 @@ import java.util.List;
 
 public class KolekcjonerSportowiec extends PlanujacySportowiec {
 
+    private final Osrodek osrodek;
+
     public KolekcjonerSportowiec(int id, int poziomZaawansowania, double wspolczynnikSpontanicznosci,
                                  double wspolczynnikTrudnosci, double wspolczynnikNawierzchni,
                                  double wspolczynnikZnudzenia, double wagaZnudzenia, boolean sledzony,
