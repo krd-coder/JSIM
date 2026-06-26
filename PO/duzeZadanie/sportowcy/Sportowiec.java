@@ -18,6 +18,7 @@ public abstract class Sportowiec {
     protected final int WSPOLCZYNNIK_ROZNICY_POZIOMOW_TRUDNOSCI = 5;
     protected final int WSPOLCZYNNIK_ROZNICY_POZIOMOW_TRUDNOSCI_LATWEJ_TRASY = 7;
     protected final double DOMYSLNA_ATRAKCYJNOSC_LATWEJ_TRASY = 0.2;
+    protected final Map<Krawedz, List<Integer>> historiaPrzejazdowKrawedzi = new HashMap<>();
 
     protected final int id;
     protected final int poziomZaawansowania;
@@ -25,7 +26,7 @@ public abstract class Sportowiec {
     protected final double wspolczynnikTrudnosci;
     protected final double wspolczynnikNawierzchni;
     
-    // Pola dla znudzenia
+
     protected final double wspolczynnikZnudzenia; // beta z przedziału [0, 1]
     protected final double wagaZnudzenia;         // alpha_z
 
@@ -144,24 +145,37 @@ public abstract class Sportowiec {
 
     protected DolaczenieDoKolejki nastepnyKrokWyciag(Moment moment, Wyciag wyciag) {
         return new DolaczenieDoKolejki(moment, wyciag, this);
+        
+        // Dodanie numeru wjazdu do historii
+        historiaPrzejazdowKrawedzi.computeIfAbsent(trasa, k -> new ArrayList<>()).add(licznikWszystkichZjazdow);
     }
 
     protected RozpoczecieZjazdu nastepnyKrokTrasa(Moment moment, Trasa trasa) {
         return new RozpoczecieZjazdu(moment, trasa, this);
+        
+        // Dodanie numeru zjazdu do historii
+        historiaPrzejazdowKrawedzi.computeIfAbsent(trasa, k -> new ArrayList<>()).add(licznikWszystkichZjazdow);
     }
 
     public abstract Zdarzenie nastepnyKrok(Moment moment, Wezel obecnyWezel);
 
     public abstract Sportowiec kopia(int przesuniecieId, Interwal przesuniecieMomentuStartu);
 
-    // W klasie Sportowiec
     public int liczbaPrzejazdow(duzeZadanie.osrodek.krawedz.Krawedz krawedz) {
         return licznikWszystkichZjazdow - (znudzenieTrasami.getOrDefault(krawedz, new StanZnudzenia(0.0, 0))).indeksOstatniegoZjazdu; 
     }
 
     public String pobierzHistorieKrawedzi(duzeZadanie.osrodek.krawedz.Krawedz krawedz) {
-        // TODO: Zwróć string typu "1, 4, 7" dla podanej krawędzi
-        return ""; 
+        List<Integer> historia = historiaPrzejazdowKrawedzi.get(krawedz);
+        
+        if (historia == null || historia.isEmpty()) {
+            return "";
+        }
+        
+        // Zamiana listy liczb na string w odpowiednim formacie
+        return historia.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", "));
     }
 
     @Override
