@@ -7,6 +7,7 @@ import duzeZadanie.osrodek.Osrodek;
 import duzeZadanie.osrodek.Wezel;
 import duzeZadanie.osrodek.krawedz.Krawedz;
 import duzeZadanie.osrodek.krawedz.Trasa;
+import duzeZadanie.BFS.NawigacjaBFS;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class KolekcjonerSportowiec extends PlanujacySportowiec {
         int minOdleglosc = Integer.MAX_VALUE;
         double maxAtrakcyjnosc = -1.0;
 
-        List<Trasa> wszystkieTrasy = osrodek.trasy();
+        Trasa[] wszystkieTrasy = osrodek.trasy();
 
         for (Trasa trasa : wszystkieTrasy) {
             int liczbaZjazdow = liczbaPrzejazdow(trasa);
@@ -38,11 +39,11 @@ public class KolekcjonerSportowiec extends PlanujacySportowiec {
             if (liczbaZjazdow < minZjazdow) {
                 wybranaTrasa = trasa;
                 minZjazdow = liczbaZjazdow;
-                minOdleglosc = WyszukiwarkaSciezek.obliczOdleglosc(obecnyWezel, trasa.poczatek());
+                minOdleglosc = NawigacjaBFS.WyznaczPlan(obecnyWezel, trasa.poczatek()).size();
                 maxAtrakcyjnosc = lacznaAtrakcyjnosc(trasa);
             } else if (liczbaZjazdow == minZjazdow) {
                 // Remisy rozstrzygane najpierw odległością BFS
-                int odleglosc = WyszukiwarkaSciezek.obliczOdleglosc(obecnyWezel, trasa.poczatek());
+                int odleglosc = NawigacjaBFS.WyznaczPlan(obecnyWezel, trasa.poczatek()).size();
                 if (odleglosc < minOdleglosc) {
                     wybranaTrasa = trasa;
                     minOdleglosc = odleglosc;

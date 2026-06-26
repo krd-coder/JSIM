@@ -30,7 +30,7 @@ public class ZachlannySportowiec extends PlanujacySportowiec {
         double maxAtrakcyjnosc = -1.0;
 
         // Tutaj sportowiec musi mieć dostęp do wszystkich tras w grafie
-        List<Trasa> wszystkieTrasy = osrodek.trasy();
+        Trasa[] wszystkieTrasy = osrodek.trasy();
 
         for (Trasa trasa : wszystkieTrasy) {
             double atrakcyjnosc = lacznaAtrakcyjnosc(trasa);

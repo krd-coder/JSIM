@@ -2,6 +2,7 @@ package duzeZadanie.osrodek;
 
 import duzeZadanie.osrodek.krawedz.Trasa;
 import duzeZadanie.osrodek.krawedz.wyciag.Wyciag;
+import duzeZadanie.osrodek.krawedz.Krawedz;
 
 public class Wezel {
 
