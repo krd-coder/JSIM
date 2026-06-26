@@ -110,7 +110,7 @@ public class Symulacja {
                 List<String> tekst = Arrays.asList(wyciag.etykietaParametry().split("\n"));
                 generator.dodajKrawedz(wyciag.poczatek().id(), wyciag.koniec().id(), stylWyciagu, tekst);
             }
-            generator.zapiszMapke("parametry.tex");
+            generator.tworzMapke("parametry.tex");
 
             // --- MAPKA 2: STATYSTYKI ---
             generator.zeruj();
@@ -123,7 +123,7 @@ public class Symulacja {
                 List<String> tekst = Arrays.asList(wyciag.etykietaStatystyki().split("\n"));
                 generator.dodajKrawedz(wyciag.poczatek().id(), wyciag.koniec().id(), stylWyciagu, tekst);
             }
-            generator.zapiszMapke("statystyki.tex");
+            generator.tworzMapke("statystyki.tex");
 
             // --- MAPKA 3: HISTORIE ŚLEDZONYCH SPORTOWCÓW ---
             for (Sportowiec s : sportowcy) {
@@ -156,7 +156,7 @@ public class Symulacja {
                     }
                     
                     // Nazwa pliku zawiera numer sportowca [cite: 154]
-                    generator.zapiszMapke("historia_sportowca_" + s.id() + ".tex");
+                    generator.tworzMapke("historia_sportowca_" + s.id() + ".tex");
                 }
             }
 

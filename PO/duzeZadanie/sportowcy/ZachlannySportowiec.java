@@ -7,7 +7,7 @@ import duzeZadanie.osrodek.Wezel;
 import duzeZadanie.osrodek.krawedz.Trasa;
 import java.util.List;
 
-public class ZachlannySportowiec extends PlanujacySportowiec {
+public class ZachlannySportowiec extends Sportowiec {
 
     // Zachłanny sportowiec potrzebuje wiedzy o całym ośrodku, 
     // aby ocenić wszystkie dostępne w nim trasy.
