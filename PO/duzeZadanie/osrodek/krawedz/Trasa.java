@@ -73,7 +73,7 @@ public class Trasa extends Krawedz {
      */
     public String etykietaParametry() {
         return String.format(Locale.US, "t%d: poziom: %d, czas: %ds\nodporność: %.2f, %.5f",
-                id(), poziomTrudnosci, dlugosc().wSekundach(), bazowaAtrakcyjnosc, odpornoscNaNierownosci);
+                id(), poziomTrudnosci, dlugosc(), bazowaAtrakcyjnosc, odpornoscNaNierownosci);
     }
 
     /**
