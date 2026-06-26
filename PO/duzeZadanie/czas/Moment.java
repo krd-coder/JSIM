@@ -45,8 +45,8 @@ public class Moment {
     long tenCzas = this.godzina * 3600L + this.minuta * 60L + this.sekunda;
     long innyCzas = inny.godzina * 3600L + inny.minuta * 60L + inny.sekunda;
     return Math.abs(tenCzas - innyCzas);
-}
-}
+    }
+
 
     private int sekundy() {
         return LICZBA_SEKUND_W_GODZINIE * godzina + LICZBA_SEKUND_W_MINUCIE * minuta + sekunda;
