@@ -12,8 +12,6 @@ import java.util.List;
 
 public class ZachlannySportowiec extends PlanujacySportowiec {
 
-    private final Osrodek osrodek;
-
     public ZachlannySportowiec(int id, int poziomZaawansowania, double wspolczynnikSpontanicznosci,
                                double wspolczynnikTrudnosci, double wspolczynnikNawierzchni,
                                double wspolczynnikZnudzenia, double wagaZnudzenia, boolean sledzony,

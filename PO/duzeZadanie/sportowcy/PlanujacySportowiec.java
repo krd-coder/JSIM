@@ -16,14 +16,15 @@ import java.util.Queue;
 public abstract class PlanujacySportowiec extends Sportowiec {
 
     protected Queue<Krawedz> aktualnyPlan = new LinkedList<>();
-
+    protected final Osrodek osrodek;
     public PlanujacySportowiec(int id, int poziomZaawansowania, double wspolczynnikSpontanicznosci,
                                double wspolczynnikTrudnosci, double wspolczynnikNawierzchni,
                                double wspolczynnikZnudzenia, double wagaZnudzenia, boolean sledzony,
-                               Wezel wezelStartowy, Moment momentStartu, MaszynaLosujaca maszynaLosujaca) {
+                               Wezel wezelStartowy, Moment momentStartu, MaszynaLosujaca maszynaLosujaca, Osrodek osrodek) {
         super(id, poziomZaawansowania, wspolczynnikSpontanicznosci, wspolczynnikTrudnosci,
               wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia, sledzony,
               wezelStartowy, momentStartu, maszynaLosujaca);
+        this.osrodek = osrodek;
     }
 
     @Override

@@ -4,6 +4,7 @@ import duzeZadanie.osrodek.Osrodek;
 import duzeZadanie.osrodek.Wezel;
 import duzeZadanie.osrodek.krawedz.Trasa;
 import duzeZadanie.osrodek.krawedz.wyciag.Wyciag;
+import duzeZadanie.osrodek.krawedz.Krawedz;
 
 import java.util.ArrayList;
 import java.util.Collections;
