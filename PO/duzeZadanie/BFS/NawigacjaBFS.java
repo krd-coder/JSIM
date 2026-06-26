@@ -109,4 +109,9 @@ public class NawigacjaBFS {
 
         return plan;
     }
+
+    public int obliczOdleglosc(Wezel start, Wezel cel) {
+        List<Krawedz> plan = WyznaczPlan(start, cel);
+        return plan.size(); // Liczba krawędzi w planie to odległość
+    }
 }

@@ -37,11 +37,11 @@ public class KolekcjonerSportowiec extends PlanujacySportowiec {
             if (liczbaZjazdow < minZjazdow) {
                 wybranaTrasa = trasa;
                 minZjazdow = liczbaZjazdow;
-                minOdleglosc = NawigacjaBFS.WyznaczPlan(obecnyWezel, trasa.poczatek()).size();
+                minOdleglosc = NawigacjaBFS.WyznaczOdleglosc(obecnyWezel, trasa.poczatek());
                 maxAtrakcyjnosc = lacznaAtrakcyjnosc(trasa);
             } else if (liczbaZjazdow == minZjazdow) {
                 // Remisy rozstrzygane najpierw odległością BFS
-                int odleglosc = NawigacjaBFS.WyznaczPlan(obecnyWezel, trasa.poczatek()).size();
+                int odleglosc = NawigacjaBFS.WyznaczOdleglosc(obecnyWezel, trasa.poczatek());
                 if (odleglosc < minOdleglosc) {
                     wybranaTrasa = trasa;
                     minOdleglosc = odleglosc;
