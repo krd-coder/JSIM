@@ -19,7 +19,6 @@ public class ZachlannySportowiec extends PlanujacySportowiec {
         super(id, poziomZaawansowania, wspolczynnikSpontanicznosci, wspolczynnikTrudnosci,
               wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia, sledzony,
               wezelStartowy, momentStartu, maszynaLosujaca, osrodek);
-        this.osrodek = osrodek;
     }
 
     @Override

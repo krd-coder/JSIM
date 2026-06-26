@@ -4,6 +4,7 @@ import duzeZadanie.czas.Moment;
 import duzeZadanie.kolejkaZdarzen.zdarzenia.Zdarzenie;
 import duzeZadanie.losowosc.MaszynaLosujaca;
 import duzeZadanie.osrodek.Wezel;
+import duzeZadanie.osrodek.Osrodek;
 import duzeZadanie.osrodek.krawedz.Krawedz;
 import duzeZadanie.osrodek.krawedz.Trasa;
 import duzeZadanie.osrodek.krawedz.wyciag.Wyciag;
