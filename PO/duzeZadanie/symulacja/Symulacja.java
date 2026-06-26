@@ -13,12 +13,12 @@ import duzeZadanie.osrodek.krawedz.wyciag.Wyciag;
 import duzeZadanie.sportowcy.Sportowiec;
 
 // Zakładane importy z dostarczonej paczki GeneratorMapek (dostosuj do struktury projektu)
-import generatorMapek.GeneratorMapek;
-import generatorMapek.pliki.WyjatekSystemuPlikow;
-import generatorMapek.styl.StylWezla;
-import generatorMapek.styl.GruboscKonturu;
-import generatorMapek.styl.StylKrawedzi;
-import generatorMapek.styl.StylLinii;
+import kadra.mapki.GeneratorMapek;
+import kadra.mapki.pliki.WyjatekSystemuPlikow;
+import kadra.mapki.styl.StylWezla;
+import kadra.mapki.styl.GruboscKonturu;
+import kadra.mapki.styl.StylKrawedzi;
+import kadra.mapki.styl.StylLinii;
 
 import java.util.Arrays;
 import java.util.List;
