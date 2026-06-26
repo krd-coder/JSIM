@@ -14,10 +14,10 @@ public class ZachlannySportowiec extends PlanujacySportowiec {
     public ZachlannySportowiec(int id, int poziomZaawansowania, double wspolczynnikSpontanicznosci,
                                double wspolczynnikTrudnosci, double wspolczynnikNawierzchni,
                                double wspolczynnikZnudzenia, double wagaZnudzenia, boolean sledzony,
-                               Wezel wezelStartowy, Moment momentStartu, MaszynaLosujaca maszynaLosujaca) {
+                               Wezel wezelStartowy, Moment momentStartu, MaszynaLosujaca maszynaLosujaca, Osrodek osrodek) {
         super(id, poziomZaawansowania, wspolczynnikSpontanicznosci, wspolczynnikTrudnosci,
               wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia, sledzony,
-              wezelStartowy, momentStartu, maszynaLosujaca);
+              wezelStartowy, momentStartu, maszynaLosujaca, osrodek);
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ZachlannySportowiec extends PlanujacySportowiec {
         double maxAtrakcyjnosc = -1.0;
 
         // Tutaj sportowiec musi mieć dostęp do wszystkich tras w grafie
-        List<Trasa> wszystkieTrasy = obecnyWezel.pobierzOsrodek().pobierzWszystkieTrasy();
+        List<Trasa> wszystkieTrasy = osrodek.trasy();
 
         for (Trasa trasa : wszystkieTrasy) {
             double atrakcyjnosc = lacznaAtrakcyjnosc(trasa);
@@ -48,6 +48,6 @@ public class ZachlannySportowiec extends PlanujacySportowiec {
     public Sportowiec kopia(int przesuniecieId, Interwal przesuniecieMomentuStartu) {
         return new ZachlannySportowiec(this.id + przesuniecieId, poziomZaawansowania, wspolczynnikSpontanicznosci,
                 wspolczynnikTrudnosci, wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia,
-                sledzony, wezelStartowy, momentStartu.dodaj(przesuniecieMomentuStartu), maszynaLosujaca);
+                sledzony, wezelStartowy, momentStartu.dodaj(przesuniecieMomentuStartu), maszynaLosujaca, osrodek);
     }
 }

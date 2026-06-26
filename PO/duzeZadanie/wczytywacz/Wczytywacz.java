@@ -160,13 +160,13 @@ public class Wczytywacz {
                 pierwszySportowiec = new ZachlannySportowiec(nastepneId, poziomZaawansowania, 
                     wspolczynnikSpontanicznosci, wagaDopasowania, wagaJakosciNawierzchni, 
                     wspolczynnikZnudzenia, wagaZnudzenia, czySledzeni, 
-                    wezly[idPoczatkowegoWezla], start, maszynaLosujaca);
+                    wezly[idPoczatkowegoWezla], start, maszynaLosujaca, osrodek);
                 break;
             case "K":
                 pierwszySportowiec = new KolekcjonerSportowiec(nastepneId, poziomZaawansowania, 
                     wspolczynnikSpontanicznosci, wagaDopasowania, wagaJakosciNawierzchni, 
                     wspolczynnikZnudzenia, wagaZnudzenia, czySledzeni, 
-                    wezly[idPoczatkowegoWezla], start, maszynaLosujaca);
+                    wezly[idPoczatkowegoWezla], start, maszynaLosujaca, osrodek);
                 break;
             case "L":
             default:

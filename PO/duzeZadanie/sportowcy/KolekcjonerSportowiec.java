@@ -15,10 +15,10 @@ public class KolekcjonerSportowiec extends PlanujacySportowiec {
     public KolekcjonerSportowiec(int id, int poziomZaawansowania, double wspolczynnikSpontanicznosci,
                                  double wspolczynnikTrudnosci, double wspolczynnikNawierzchni,
                                  double wspolczynnikZnudzenia, double wagaZnudzenia, boolean sledzony,
-                                 Wezel wezelStartowy, Moment momentStartu, MaszynaLosujaca maszynaLosujaca) {
+                                 Wezel wezelStartowy, Moment momentStartu, MaszynaLosujaca maszynaLosujaca, Osrodek osrodek) {
         super(id, poziomZaawansowania, wspolczynnikSpontanicznosci, wspolczynnikTrudnosci,
               wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia, sledzony,
-              wezelStartowy, momentStartu, maszynaLosujaca);
+              wezelStartowy, momentStartu, maszynaLosujaca, osrodek);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class KolekcjonerSportowiec extends PlanujacySportowiec {
         int minOdleglosc = Integer.MAX_VALUE;
         double maxAtrakcyjnosc = -1.0;
 
-        List<Trasa> wszystkieTrasy = obecnyWezel.pobierzOsrodek().pobierzWszystkieTrasy();
+        List<Trasa> wszystkieTrasy = osrodek.trasy();
 
         for (Trasa trasa : wszystkieTrasy) {
             int liczbaZjazdow = liczbaPrzejazdow(trasa);
@@ -36,11 +36,11 @@ public class KolekcjonerSportowiec extends PlanujacySportowiec {
             if (liczbaZjazdow < minZjazdow) {
                 wybranaTrasa = trasa;
                 minZjazdow = liczbaZjazdow;
-                minOdleglosc = WyszukiwarkaSciezek.obliczOdleglosc(obecnyWezel, trasa.pobierzPoczatek());
+                minOdleglosc = WyszukiwarkaSciezek.obliczOdleglosc(obecnyWezel, trasa.poczatek());
                 maxAtrakcyjnosc = lacznaAtrakcyjnosc(trasa);
             } else if (liczbaZjazdow == minZjazdow) {
                 // Remisy rozstrzygane najpierw odległością BFS
-                int odleglosc = WyszukiwarkaSciezek.obliczOdleglosc(obecnyWezel, trasa.pobierzPoczatek());
+                int odleglosc = WyszukiwarkaSciezek.obliczOdleglosc(obecnyWezel, trasa.poczatek());
                 if (odleglosc < minOdleglosc) {
                     wybranaTrasa = trasa;
                     minOdleglosc = odleglosc;
@@ -68,6 +68,6 @@ public class KolekcjonerSportowiec extends PlanujacySportowiec {
     public Sportowiec kopia(int przesuniecieId, Interwal przesuniecieMomentuStartu) {
         return new KolekcjonerSportowiec(this.id + przesuniecieId, poziomZaawansowania, wspolczynnikSpontanicznosci,
                 wspolczynnikTrudnosci, wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia,
-                sledzony, wezelStartowy, momentStartu.dodaj(przesuniecieMomentuStartu), maszynaLosujaca);
+                sledzony, wezelStartowy, momentStartu.dodaj(przesuniecieMomentuStartu), maszynaLosujaca, osrodek);
     }
 }

@@ -32,7 +32,7 @@ public abstract class PlanujacySportowiec extends Sportowiec {
         if (aktualnyPlan.isEmpty()) {
             
             // Decyzja spontaniczna
-            if (maszynaLosujaca.losujPrawdopodobienstwo() < wspolczynnikSpontanicznosci) {
+            if (maszynaLosujaca.losowyDouble(0, 1) < wspolczynnikSpontanicznosci) {
                 Krawedz losowaKrawedz = wylosujKrawedzZWezla(obecnyWezel);
                 return wygenerujZdarzenie(moment, losowaKrawedz);
             }

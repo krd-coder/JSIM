@@ -39,7 +39,7 @@ public class NawigacjaBFS {
      * Główna metoda wyznaczająca najkrótszą ścieżkę algorytmem BFS.
      * Zwraca listę krawędzi (Tras i Wyciągów), które należy pokonać, by dotrzeć do celu.
      */
-    public List<Object> wyznaczPlan(Wezel start, Wezel cel) {
+    public List<Object> WyznaczPlan(Wezel start, Wezel cel) {
         // Mapa przechowująca węzły, które już odwiedziliśmy, wraz z historią "jak tam dotarliśmy"
         Map<Wezel, InfoBFS> odwiedzone = new HashMap<>();
         
