@@ -31,7 +31,7 @@ public class Wczytywacz {
         Wyciag[] wyciagi = wczytajWyciagi(wezly);
         Trasa[] trasy = wczytajTrasy(wezly);
 
-        // ZMIANA: Tworzymy i wiążemy struktury Ośrodka PRZED wczytaniem sportowców,
+        // Tworzymy i wiążemy struktury Ośrodka przed wczytaniem sportowców,
         // ponieważ nowi sportowcy (Zachłanny i Kolekcjoner) muszą otrzymać referencję 
         // do całego grafu, by uruchamiać BFS.
         for (Wezel wezel : wezly) {
@@ -134,14 +134,14 @@ public class Wczytywacz {
         int liczbaSportowcowWGrupie = scanner.nextInt();
         int poziomZaawansowania = scanner.nextInt();
         double wspolczynnikSpontanicznosci = scanner.nextDouble();
-        double wspolczynnikZnudzenia = scanner.nextDouble(); // Nowe [cite: 48]
-        String rodzajSportowca = scanner.next();             // Nowe: "L", "Z" lub "K" [cite: 51]
-        boolean czySledzeni = scanner.findInLine("s") != null; // [cite: 48]
+        double wspolczynnikZnudzenia = scanner.nextDouble(); 
+        String rodzajSportowca = scanner.next();             
+        boolean czySledzeni = scanner.findInLine("s") != null; 
 
         // --- NOWY FORMAT: Linia 2 ---
         double wagaDopasowania = scanner.nextDouble();
         double wagaJakosciNawierzchni = scanner.nextDouble();
-        double wagaZnudzenia = scanner.nextDouble();         // Nowe 
+        double wagaZnudzenia = scanner.nextDouble();         
 
         // --- NOWY FORMAT: Linia 3 ---
         int idPoczatkowegoWezla = scanner.nextInt();
@@ -149,7 +149,7 @@ public class Wczytywacz {
         Interwal odstepCzasowy = new Interwal(0);
 
         if (liczbaSportowcowWGrupie > 1) {
-            odstepCzasowy = new Interwal(scanner.nextInt()); // [cite: 50]
+            odstepCzasowy = new Interwal(scanner.nextInt()); 
         }
 
         Sportowiec pierwszySportowiec;

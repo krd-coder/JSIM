@@ -28,8 +28,6 @@ public class BibliotecznaKolejkaZdarzen implements KolejkaZdarzen {
         // Komparator zdefiniowany za pomocą lambdy.
         // Najpierw porównujemy czasy zdarzeń, a w przypadku remisu - kolejność wstawienia.
         this.kolejka = new PriorityQueue<>((a, b) -> {
-            // Zakładam, że klasa Zdarzenie posiada metodę moment() zwracającą obiekt klasy Moment,
-            // a klasa Moment poprawnie implementuje interfejs Comparable<Moment>.
             int porownanieCzasu = a.zdarzenie.moment().compareTo(b.zdarzenie.moment());
             
             if (porownanieCzasu != 0) {
@@ -50,10 +48,10 @@ public class BibliotecznaKolejkaZdarzen implements KolejkaZdarzen {
     @Override
     public Zdarzenie zdejmij() {
         if (czyPusta()) {
-            // Próba pobrania zdarzenia z pustej kolejki powinna być wychwytywana[cite: 414].
+            // Próba pobrania zdarzenia z pustej kolejki powinna być wychwytywana.
             throw new IllegalStateException("Próba pobrania zdarzenia z pustej kolejki!"); 
         }
-        // Pobieramy (usuwając) korzeń kopca i zwracamy "odpakowane" z niego zdarzenie
+        // Pobieramy (usuwając) korzeń kopca i zwracamy zdarzenie
         return kolejka.poll().zdarzenie;
     }
 

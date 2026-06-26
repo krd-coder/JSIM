@@ -12,7 +12,6 @@ import duzeZadanie.osrodek.krawedz.Trasa;
 import duzeZadanie.osrodek.krawedz.wyciag.Wyciag;
 import duzeZadanie.sportowcy.Sportowiec;
 
-// Zakładane importy z dostarczonej paczki GeneratorMapek (dostosuj do struktury projektu)
 import kadra.mapki.GeneratorMapek;
 import kadra.mapki.pliki.WyjatekSystemuPlikow;
 import kadra.mapki.styl.StylWezla;
@@ -40,8 +39,6 @@ public class Symulacja {
         przygotujPoczatkoweZdarzenia(kolejkaZdarzen, osrodek, sportowcy);
         glownaPetla(kolejkaZdarzen, dziennik);
         zbierzStatystyki(osrodek, dziennik);
-        
-        // Nowy krok: Generowanie plików .tex z mapkami [cite: 78, 80]
         generujMapki(osrodek, sportowcy, sciezkaMapek);
     }
 
@@ -88,14 +85,13 @@ public class Symulacja {
     private void generujMapki(Osrodek osrodek, Sportowiec[] sportowcy, String sciezkaMapek) {
         if (sciezkaMapek == null || sciezkaMapek.isEmpty()) {
             System.err.println("Błąd: Nie podano ścieżki do katalogu na mapki. Uruchom program z poprawnym argumentem.");
-            return; // Przerwanie bez wyjątku, program wraca do main i kończy się naturalnie [cite: 162, 163]
+            return;
         }
 
         try {
-            // Wszystkie mapki należy wygenerować tym samym (jedynym) obiektem generatora [cite: 158]
             GeneratorMapek generator = new GeneratorMapek(sciezkaMapek);
             
-            // Styl ciągły dla tras, przerywany dla wyciągów [cite: 106]
+            // Styl ciągły dla tras, przerywany dla wyciągów
             StylKrawedzi stylTrasy = new StylKrawedzi(StylLinii.CIAGLA);
             StylKrawedzi stylWyciagu = new StylKrawedzi(StylLinii.PRZERYWANA);
 
@@ -131,14 +127,10 @@ public class Symulacja {
                     generator.zeruj();
                     rysujWezly(generator, osrodek);
                     
-                    // Zakładam istnienie metody w klasie Sportowiec zwracającej string przejazdów 
-                    // np. "3,10" dla danej krawędzi. Jeśli pusty/null, to krawędzi nie podpisujemy.
                     for (Trasa trasa : osrodek.trasy()) {
                         String historia = s.pobierzHistorieKrawedzi(trasa);
                         if (historia != null && !historia.isEmpty()) {
                             String etykieta = String.format("t%d (%d): %s", trasa.id(), s.liczbaPrzejazdow(trasa), historia);
-                            // Korzystamy z przeciążonej metody dodajKrawedz (przyjmującej String zamiast Listy), 
-                            // która automatycznie tnie i dzieli tekst [cite: 151, 152]
                             generator.dodajKrawedz(trasa.poczatek().id(), trasa.koniec().id(), stylTrasy, etykieta);
                         } else {
                             // Rysujemy krawędź bez tekstu, by struktura grafu była pełna
@@ -155,7 +147,7 @@ public class Symulacja {
                         }
                     }
                     
-                    // Nazwa pliku zawiera numer sportowca [cite: 154]
+                    // Nazwa pliku zawiera numer sportowca
                     generator.tworzMapke("historia_sportowca_" + s.id() + ".tex");
                 }
             }
@@ -178,8 +170,7 @@ public class Symulacja {
                              new StylWezla(GruboscKonturu.POGRUBIONY) : 
                              new StylWezla(GruboscKonturu.ZWYKLY);
                              
-            // Węzły skomunikowane mają mieć pogrubiony kontur względem pozostałych [cite: 106]
-            // Uwaga: Zakładam że węzeł ma metody x() i y() zczytane z formatu wejścia z cz. 1
+            // Węzły skomunikowane mają mieć pogrubiony kontur względem pozostałych 
             generator.dodajWezel(w.id(), w.wspolrzednaX(), w.wspolrzednaY(), styl);
         }
     }

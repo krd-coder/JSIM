@@ -59,9 +59,11 @@ public abstract class PlanujacySportowiec extends Sportowiec {
         }
     }
 
-    // Prosta metoda losująca dowolną krawędź z węzła (do implementacji własnej zależnie od Wezla)
-    protected abstract Krawedz wylosujKrawedzZWezla(Wezel wezel);
+    // Metoda losująca dowolną krawędź z węzła, taka sama dla każdego sportowca, więc nie musi być abstrakcyjna.
+    private Krawedz wylosujKrawedzZWezla(Wezel wezel) {
+        Krawedz[] wszystkie = wezel.pobierzWszystkieWychodzace();
+        return wszystkie[maszynaLosujaca.losowyInt(0, wszystkie.length - 1)];
+    }
 
-    // Abstrakcyjna metoda do zaimplementowania przez Zachłannego i Kolekcjonera
     protected abstract Trasa znajdzTraseDocelowa(Wezel obecnyWezel);
 }

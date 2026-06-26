@@ -40,12 +40,6 @@ public class ZachlannySportowiec extends PlanujacySportowiec {
     }
 
     @Override
-    protected Krawedz wylosujKrawedzZWezla(Wezel wezel) {
-        Krawedz[] wszystkie = wezel.pobierzWszystkieWychodzace();
-        return wszystkie[maszynaLosujaca.losowyInt(0, wszystkie.length - 1)];
-    }
-
-    @Override
     public Sportowiec kopia(int przesuniecieId, Interwal przesuniecieMomentuStartu) {
         return new ZachlannySportowiec(this.id + przesuniecieId, poziomZaawansowania, wspolczynnikSpontanicznosci,
                 wspolczynnikTrudnosci, wspolczynnikNawierzchni, wspolczynnikZnudzenia, wagaZnudzenia,

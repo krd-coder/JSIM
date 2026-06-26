@@ -41,10 +41,9 @@ public class NawigacjaBFS {
      * Zwraca listę krawędzi (Tras i Wyciągów), które należy pokonać, by dotrzeć do celu.
      */
     public static List<Krawedz> WyznaczPlan(Wezel start, Wezel cel) {
-        // Mapa przechowująca węzły, które już odwiedziliśmy, wraz z historią "jak tam dotarliśmy"
+        // Mapa przechowująca węzły, które już odwiedziliśmy, wraz z historią
         Map<Wezel, InfoBFS> odwiedzone = new HashMap<>();
         
-        // Zmiana na wbudowaną kolejkę Javy! (LinkedList idealnie implementuje interfejs Queue)
         Queue<Wezel> kolejka = new LinkedList<>();
 
         // Inicjalizacja dla wierzchołka startowego
