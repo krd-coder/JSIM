@@ -3,6 +3,7 @@ package duzeZadanie.sportowcy;
 import duzeZadanie.czas.Interwal;
 import duzeZadanie.czas.Moment;
 import duzeZadanie.losowosc.MaszynaLosujaca;
+import duzeZadanie.osrodek.Osrodek;
 import duzeZadanie.osrodek.Wezel;
 import duzeZadanie.osrodek.krawedz.Krawedz;
 import duzeZadanie.osrodek.krawedz.Trasa;

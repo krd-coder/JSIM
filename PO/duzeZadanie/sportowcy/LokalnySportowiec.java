@@ -25,7 +25,7 @@ public class LokalnySportowiec extends Sportowiec {
     @Override
     public Zdarzenie nastepnyKrok(Moment moment, Wezel obecnyWezel) {
         // Sprawdzanie decyzji spontanicznej
-        if (maszynaLosujaca.losujPrawdopodobienstwo() < wspolczynnikSpontanicznosci) {
+        if (maszynaLosujaca.losowyDouble(0, 1) < wspolczynnikSpontanicznosci) {
             List<Krawedz> wszystkieKrawedzie = obecnyWezel.pobierzWszystkieWychodzace();
             int wylosowanyIndeks = maszynaLosujaca.losowyInt(0, wszystkieKrawedzie.size() - 1);
             Krawedz losowa = wszystkieKrawedzie.get(wylosowanyIndeks);
@@ -38,7 +38,7 @@ public class LokalnySportowiec extends Sportowiec {
         double maxAtrakcyjnosc = -1.0;
 
         // Trasy bezpośrednio z węzła
-        for (Trasa trasa : obecnyWezel.pobierzTrasy()) {
+        for (Trasa trasa : obecnyWezel.wychodzaceTrasy()) {
             double atrakcyjnosc = lacznaAtrakcyjnosc(trasa);
             if (atrakcyjnosc > maxAtrakcyjnosc) {
                 maxAtrakcyjnosc = atrakcyjnosc;
@@ -47,9 +47,9 @@ public class LokalnySportowiec extends Sportowiec {
         }
 
         // Trasy dostępne z wyciągów
-        for (Wyciag wyciag : obecnyWezel.pobierzWyciagi()) {
-            Wezel gornaStacja = wyciag.pobierzKoniec();
-            for (Trasa trasaNaGorze : gornaStacja.pobierzTrasy()) {
+        for (Wyciag wyciag : obecnyWezel.wychodzaceWyciagi()) {
+            Wezel gornaStacja = wyciag.koniec();
+            for (Trasa trasaNaGorze : gornaStacja.wychodzaceTrasy()) {
                 double atrakcyjnosc = lacznaAtrakcyjnosc(trasaNaGorze);
                 if (atrakcyjnosc > maxAtrakcyjnosc) {
                     maxAtrakcyjnosc = atrakcyjnosc;
