@@ -8,9 +8,11 @@ import duzeZadanie.kolejkaZdarzen.zdarzenia.Zdarzenie;
 import duzeZadanie.losowosc.MaszynaLosujaca;
 import duzeZadanie.osrodek.Wezel;
 import duzeZadanie.osrodek.krawedz.Trasa;
+import duzeZadanie.osrodek.krawedz.Krawedz;
 import duzeZadanie.osrodek.krawedz.wyciag.Wyciag;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ArrayList; // Dodaj import
 import java.util.stream.Collectors; // Dodaj import
@@ -146,17 +148,17 @@ public abstract class Sportowiec {
     }
 
     protected DolaczenieDoKolejki nastepnyKrokWyciag(Moment moment, Wyciag wyciag) {
-        return new DolaczenieDoKolejki(moment, wyciag, this);
-        
+
         // Dodanie numeru wjazdu do historii
         historiaPrzejazdowKrawedzi.computeIfAbsent(wyciag, k -> new ArrayList<>()).add(licznikWszystkichZjazdow);
+        return new DolaczenieDoKolejki(moment, wyciag, this);
     }
 
     protected RozpoczecieZjazdu nastepnyKrokTrasa(Moment moment, Trasa trasa) {
-        return new RozpoczecieZjazdu(moment, trasa, this);
-        
+
         // Dodanie numeru zjazdu do historii
         historiaPrzejazdowKrawedzi.computeIfAbsent(trasa, k -> new ArrayList<>()).add(licznikWszystkichZjazdow);
+        return new RozpoczecieZjazdu(moment, trasa, this);
     }
 
     public abstract Zdarzenie nastepnyKrok(Moment moment, Wezel obecnyWezel);

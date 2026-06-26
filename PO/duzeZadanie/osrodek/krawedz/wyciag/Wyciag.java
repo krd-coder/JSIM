@@ -147,4 +147,12 @@ public class Wyciag extends Krawedz {
     public String toString() {
         return String.format("Wyciąg nr %d", id());
     }
+
+    public int dlugoscKolejki() {
+        return obecnaKolejka.rozmiar();
+    }
+
+    public int maksymalnaDlugoscKolejki() {
+        return maksymalnaDlugoscKolejki;
+    }
 }

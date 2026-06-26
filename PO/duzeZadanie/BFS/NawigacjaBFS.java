@@ -15,10 +15,8 @@ import java.util.Map;
 import java.util.Queue; // Wbudowany interfejs kolejki
 
 public class NawigacjaBFS {
-    private final Osrodek osrodek;
 
-    public NawigacjaBFS(Osrodek osrodek) {
-        this.osrodek = osrodek;
+    public NawigacjaBFS() {
     }
 
     /**
@@ -110,7 +108,7 @@ public class NawigacjaBFS {
         return plan;
     }
 
-    public int obliczOdleglosc(Wezel start, Wezel cel) {
+    public static int obliczOdleglosc(Wezel start, Wezel cel) {
         List<Krawedz> plan = WyznaczPlan(start, cel);
         return plan.size(); // Liczba krawędzi w planie to odległość
     }
