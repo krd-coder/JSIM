@@ -26,10 +26,10 @@ public class LokalnySportowiec extends Sportowiec {
     public Zdarzenie nastepnyKrok(Moment moment, Wezel obecnyWezel) {
         // Sprawdzanie decyzji spontanicznej
         if (maszynaLosujaca.losowyDouble(0, 1) < wspolczynnikSpontanicznosci) {
-            List<Krawedz> wszystkieKrawedzie = obecnyWezel.pobierzWszystkieWychodzace();
-            int wylosowanyIndeks = maszynaLosujaca.losowyInt(0, wszystkieKrawedzie.size() - 1);
-            Krawedz losowa = wszystkieKrawedzie.get(wylosowanyIndeks);
-            
+            Krawedz[] wszystkieKrawedzie = obecnyWezel.pobierzWszystkieWychodzace();
+            int wylosowanyIndeks = maszynaLosujaca.losowyInt(0, wszystkieKrawedzie.length - 1);
+            Krawedz losowa = wszystkieKrawedzie[wylosowanyIndeks];
+
             if (losowa instanceof Trasa) return nastepnyKrokTrasa(moment, (Trasa) losowa);
             return nastepnyKrokWyciag(moment, (Wyciag) losowa);
         }
