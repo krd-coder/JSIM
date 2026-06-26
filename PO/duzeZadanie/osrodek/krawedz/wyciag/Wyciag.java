@@ -122,7 +122,7 @@ public class Wyciag extends Krawedz {
      */
     public String etykietaParametry() {
         return String.format(Locale.US, "w%d: %d os. co %ds\nczas: %ds",
-                id(), ladownosc, odstepMiedzyOdjazdami.wSekundach(), dlugosc().wSekundach());
+                id(), ladownosc, odstepMiedzyOdjazdami, dlugosc());
     }
 
     /**

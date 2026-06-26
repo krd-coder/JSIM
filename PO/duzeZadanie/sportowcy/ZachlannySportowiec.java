@@ -1,6 +1,6 @@
 package duzeZadanie.sportowcy;
 
-import duzeZadanie.algorytmy.BFS;
+import duzeZadanie.BFS.NawigacjaBFS;
 import duzeZadanie.czas.Interwal;
 import duzeZadanie.osrodek.Osrodek;
 import duzeZadanie.osrodek.Wezel;
@@ -31,9 +31,8 @@ public class ZachlannySportowiec extends PlanujacySportowiec {
         Trasa najlepszaTrasa = null;
         double najwiekszaAtrakcyjnosc = -1.0;
 
-        // UWAGA: Upewnij się, że masz metodę zwracającą wszystkie trasy w klasie Osrodek
-        // (np. pobierzWszystkieTrasy(), zwracającą List<Trasa> lub Trasa[])
-        for (Trasa trasa : osrodek.pobierzWszystkieTrasy()) {
+
+        for (Trasa trasa : osrodek.trasy()) {
             double atrakcyjnosc = lacznaAtrakcyjnosc(trasa);
             
             if (atrakcyjnosc > najwiekszaAtrakcyjnosc) {

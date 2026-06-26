@@ -40,6 +40,11 @@ public class Moment {
         return compareTo(moment) < 0;
     }
 
+    public long odlegloscWSekundach(Moment inny) {
+    // Oblicz i zwróć (w sekundach) różnicę między 'this' a 'inny'
+    return Math.abs(this.czasWsekundach() - inny.czasWsekundach()); 
+}
+
     private int sekundy() {
         return LICZBA_SEKUND_W_GODZINIE * godzina + LICZBA_SEKUND_W_MINUCIE * minuta + sekunda;
     }

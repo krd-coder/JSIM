@@ -48,7 +48,7 @@ public class BibliotecznaKolejkaZdarzen implements KolejkaZdarzen {
     }
 
     @Override
-    public Zdarzenie pobierz() {
+    public Zdarzenie zdejmij() {
         if (czyPusta()) {
             // Próba pobrania zdarzenia z pustej kolejki powinna być wychwytywana[cite: 414].
             throw new IllegalStateException("Próba pobrania zdarzenia z pustej kolejki!"); 

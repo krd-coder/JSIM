@@ -180,7 +180,7 @@ public class Symulacja {
                              
             // Węzły skomunikowane mają mieć pogrubiony kontur względem pozostałych [cite: 106]
             // Uwaga: Zakładam że węzeł ma metody x() i y() zczytane z formatu wejścia z cz. 1
-            generator.dodajWezel(w.id(), w.x(), w.y(), styl);
+            generator.dodajWezel(w.id(), w.wspolrzednaX(), w.wspolrzednaY(), styl);
         }
     }
 }

@@ -80,6 +80,8 @@ public abstract class Sportowiec {
 
     public int id() { return id; }
     public Moment momentStartu() { return momentStartu; }
+    public boolean sledzony() { return sledzony; }
+    public Wezel wezelStartowy() { return wezelStartowy; }
 
     /**
      * Zaktualizowany wzór z części 2. Uwzględnia aktualne znudzenie (z_t).
@@ -151,6 +153,17 @@ public abstract class Sportowiec {
     public abstract Zdarzenie nastepnyKrok(Moment moment, Wezel obecnyWezel);
 
     public abstract Sportowiec kopia(int przesuniecieId, Interwal przesuniecieMomentuStartu);
+
+    // W klasie Sportowiec
+    public int liczbaPrzejazdow(duzeZadanie.osrodek.krawedz.Krawedz krawedz) {
+        // TODO: Zwróć liczbę przejazdów tą krawędzią
+        return 0; 
+    }
+
+    public String pobierzHistorieKrawedzi(duzeZadanie.osrodek.krawedz.Krawedz krawedz) {
+        // TODO: Zwróć string typu "1, 4, 7" dla podanej krawędzi
+        return ""; 
+    }
 
     @Override
     public String toString() {
